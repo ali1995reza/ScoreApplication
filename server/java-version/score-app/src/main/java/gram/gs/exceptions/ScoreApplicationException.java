@@ -8,4 +8,8 @@ public class ScoreApplicationException extends Exception {
         super(e);
         this.id = id;
     }
+
+    public String getId() {
+        return id;
+    }
 }
