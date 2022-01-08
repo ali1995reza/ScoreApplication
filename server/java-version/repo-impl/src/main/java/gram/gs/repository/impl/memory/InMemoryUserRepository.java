@@ -3,36 +3,36 @@ package gram.gs.repository.impl.memory;
 import gram.gs.assertion.Assert;
 import gram.gs.exceptions.UserAlreadyExistsException;
 import gram.gs.model.User;
-import gram.gs.repository.UserRepository;
+import gram.gs.repository.impl.ValidatedUserRepository;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemoryUserRepository implements UserRepository {
+public class InMemoryUserRepository extends ValidatedUserRepository {
 
-    private final ConcurrentHashMap<String, User> usres;
+    private final ConcurrentHashMap<String, User> users;
 
     public InMemoryUserRepository() {
-        usres = new ConcurrentHashMap<>();
+        users = new ConcurrentHashMap<>();
     }
 
     @Override
-    public User get(String id) {
-        return usres.get(id);
+    public User doGet(String id) {
+        return users.get(id);
     }
 
     @Override
-    public User add(String id) throws UserAlreadyExistsException {
-        Assert.isFalse(usres.containsKey(id), UserAlreadyExistsException::new);
-        return usres.computeIfAbsent(id, User::new);
+    public User doAdd(String id) throws UserAlreadyExistsException {
+        Assert.isFalse(users.containsKey(id), UserAlreadyExistsException::new);
+        return users.computeIfAbsent(id, User::new);
     }
 
     @Override
-    public User addOrGet(String id) {
-        return usres.computeIfAbsent(id, User::new);
+    public User doAddOrGet(String id) {
+        return users.computeIfAbsent(id, User::new);
     }
 
     @Override
     public void clear() {
-        usres.clear();
+        users.clear();
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class ValidatedScoreRepository implements ScoreRepository {
 
     @Override
-    public RankedScore save(String userId, String applicationId, long score) {
+    public final RankedScore save(String userId, String applicationId, long score) {
         Assert.isNotNull(userId, () -> new NullPointerException("user id is null"));
         Assert.isNotNull(applicationId, () -> new NullPointerException("application id is null"));
         Assert.isNotNegative(score, () -> new IllegalArgumentException("score can not be negative"));
@@ -17,7 +17,7 @@ public abstract class ValidatedScoreRepository implements ScoreRepository {
     }
 
     @Override
-    public List<RankedScore> get(String applicationId, long offset, long size) {
+    public final List<RankedScore> get(String applicationId, long offset, long size) {
         Assert.isNotNull(applicationId, () -> new NullPointerException("application id is null"));
         Assert.isNotNegative(offset, () -> new IllegalArgumentException("offset can not be negative"));
         Assert.isNotNegative(size, () -> new IllegalArgumentException("size can not be negative"));
@@ -25,7 +25,7 @@ public abstract class ValidatedScoreRepository implements ScoreRepository {
     }
 
     @Override
-    public List<RankedScore> get(String userId, String applicationId, int top, int bottom) {
+    public final List<RankedScore> get(String userId, String applicationId, int top, int bottom) {
         Assert.isNotNull(userId, () -> new NullPointerException("user id is null"));
         Assert.isNotNull(applicationId, () -> new NullPointerException("application id is null"));
         Assert.isNotNegative(top, () -> new IllegalArgumentException("top can not be negative"));
@@ -34,7 +34,7 @@ public abstract class ValidatedScoreRepository implements ScoreRepository {
     }
 
     @Override
-    public RankedScore get(String userId, String applicationId) {
+    public final RankedScore get(String userId, String applicationId) {
         Assert.isNotNull(userId, () -> new NullPointerException("user id is null"));
         Assert.isNotNull(applicationId, () -> new NullPointerException("application id is null"));
         return doGet(userId, applicationId);
