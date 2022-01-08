@@ -40,7 +40,7 @@ public class ScoreApplication {
         return scoreRepository.get(applicationId, offset, size);
     }
 
-    public List<RankedScore> getAroundScoreList(String userId, String applicationId, int top, int bottom) throws ScoreApplicationException {
+    public List<RankedScore> searchScoreList(String userId, String applicationId, int top, int bottom) throws ScoreApplicationException {
         List<RankedScore> scores = scoreRepository.get(userId, applicationId, top, bottom);
         Assert.isNotNull(scores, ScoreNotFoundException::new);
         return scores;
