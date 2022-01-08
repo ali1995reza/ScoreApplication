@@ -12,7 +12,9 @@ public class Assert {
     }
 
     public static <T extends Throwable> void isTrue(boolean condition, Supplier<T> ex) throws T {
-        isFalse(!condition, ex);
+        if (!condition) {
+            throw ex.get();
+        }
     }
 
     public static <T extends Throwable> void isNotNull(Object o, Supplier<T> ex) throws T {
@@ -41,7 +43,7 @@ public class Assert {
     }
 
     public static <T extends Throwable> void isNotBlank(String str, Supplier<T> ex) throws T {
-        isFalse(str.isBlank(), ex);
+        isFalse(str == null || str.isBlank(), ex);
     }
 
     public static <T extends Throwable> void doseNotContains(String str, List<CharSequence> sequences, Supplier<T> ex) throws T {
