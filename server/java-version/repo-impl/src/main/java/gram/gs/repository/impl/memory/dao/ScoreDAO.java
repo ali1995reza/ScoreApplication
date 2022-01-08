@@ -1,6 +1,8 @@
 package gram.gs.repository.impl.memory.dao;
 
-public class ScoreDAO {
+import java.util.Objects;
+
+public class ScoreDAO implements Comparable<ScoreDAO> {
 
     private String userId;
     private String applicationId;
@@ -43,5 +45,30 @@ public class ScoreDAO {
     public ScoreDAO score(Long score) {
         this.score = score;
         return this;
+    }
+
+    @Override
+    public int compareTo(ScoreDAO other) {
+        if(this == other) {
+            return 0;
+        }
+        int result = Long.compare(this.score, other.score);
+        if(result != 0) {
+            return result;
+        }
+        return this.userId.compareTo(other.userId);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScoreDAO scoreDAO = (ScoreDAO) o;
+        return Objects.equals(userId, scoreDAO.userId) && Objects.equals(applicationId, scoreDAO.applicationId) && Objects.equals(score, scoreDAO.score);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, applicationId, score);
     }
 }
