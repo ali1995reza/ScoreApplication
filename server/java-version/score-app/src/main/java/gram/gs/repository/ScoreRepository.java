@@ -15,7 +15,7 @@ public interface ScoreRepository {
      * @param score         score
      * @return a {@link RankedScore} instance which represent user score and current rank in rank list
      */
-    RankedScore save(String userId, String applicationId, int score);
+    RankedScore save(String userId, String applicationId, long score);
 
     /**
      * Provide the score list of a specific application in descending order
