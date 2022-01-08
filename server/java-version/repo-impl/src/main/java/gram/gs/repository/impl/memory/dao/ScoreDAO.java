@@ -1,12 +1,24 @@
 package gram.gs.repository.impl.memory.dao;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class ScoreDAO implements Comparable<ScoreDAO> {
 
+    private final String id;
     private String userId;
     private String applicationId;
     private Long score;
+
+    public ScoreDAO(String userId, String applicationId) {
+        this.id = UUID.randomUUID().toString();
+        this.userId = userId;
+        this.applicationId = applicationId;
+    }
+
+    public String getId() {
+        return id;
+    }
 
     public String getUserId() {
         return userId;
@@ -49,11 +61,11 @@ public class ScoreDAO implements Comparable<ScoreDAO> {
 
     @Override
     public int compareTo(ScoreDAO other) {
-        if(this == other) {
+        if (this == other) {
             return 0;
         }
-        int result = Long.compare(this.score, other.score);
-        if(result != 0) {
+        final int result = Long.compare(this.score, other.score);
+        if (result != 0) {
             return result;
         }
         return this.userId.compareTo(other.userId);
@@ -64,11 +76,11 @@ public class ScoreDAO implements Comparable<ScoreDAO> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ScoreDAO scoreDAO = (ScoreDAO) o;
-        return Objects.equals(userId, scoreDAO.userId) && Objects.equals(applicationId, scoreDAO.applicationId) && Objects.equals(score, scoreDAO.score);
+        return Objects.equals(id, scoreDAO.id) && Objects.equals(userId, scoreDAO.userId) && Objects.equals(applicationId, scoreDAO.applicationId) && Objects.equals(score, scoreDAO.score);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, applicationId, score);
+        return Objects.hash(id, userId, applicationId, score);
     }
 }

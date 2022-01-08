@@ -5,7 +5,7 @@ import java.util.List;
 
 public class BinarySearchUtil {
 
-    static <T> int binaryAddOrSet(List<T> arr, T x, Comparator<T> comparator) {
+    public static <T> int binaryAddOrSet(List<T> arr, T x, Comparator<T> comparator) {
         int index = binarySearch(arr, x, comparator);
         if (index >= 0) {
             arr.set(index, x);
@@ -17,14 +17,14 @@ public class BinarySearchUtil {
         return index;
     }
 
-    static <T> void binaryRemove(List<T> arr, T x, Comparator<T> comparator) {
+    public static <T> void binaryRemove(List<T> arr, T x, Comparator<T> comparator) {
         int index = binarySearch(arr, x, comparator);
         if (index >= 0) {
             arr.remove(index);
         }
     }
 
-    static <T> int binarySearch(List<T> arr, T x, Comparator<T> comparator) {
+    public static <T> int binarySearch(List<T> arr, T x, Comparator<T> comparator) {
         int low = 0;
         int high = arr.size() - 1;
 
