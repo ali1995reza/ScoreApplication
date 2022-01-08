@@ -33,7 +33,9 @@ public class InMemoryScoreRepository extends ValidatedScoreRepository {
             return doGet(userId, applicationId);
         }
         synchronized (scores) {
-            binaryRemove(scores, userScore, DESC);
+            if(userScore.getScore() != null ) {
+                binaryRemove(scores, userScore, DESC);
+            }
             userScore.setScore(score);
             final int insertIndex = binaryAddOrSet(scores, userScore, DESC);
             return map(userScore, insertIndex + 1);
