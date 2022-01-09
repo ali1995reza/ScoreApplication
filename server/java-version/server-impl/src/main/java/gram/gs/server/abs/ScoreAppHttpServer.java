@@ -35,9 +35,10 @@ public abstract class ScoreAppHttpServer {
         return this;
     }
 
-    public synchronized void host(String host) {
+    public synchronized ScoreAppHttpServer host(String host) {
         Assert.isNotNull(host, () -> new NullPointerException("host is null"));
         this.host = host;
+        return this;
     }
 
     public synchronized int getPort() {

@@ -1,10 +1,11 @@
 package gram.gs.server.impl.javalin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gram.gs.ScoreApplication;
 import gram.gs.server.abs.ScoreAppHttpServer;
 import gram.gs.server.impl.dto.SubmitScoreRequest;
 import gram.gs.server.impl.dto.TokenResponse;
+import gram.gs.server.impl.javalin.statics.ServerExceptionHandler;
+import gram.gs.server.impl.javalin.statics.ServerExceptionResponse;
 import gram.gs.server.impl.javalin.util.JsonUtil;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -16,9 +17,8 @@ import static gram.gs.server.impl.javalin.statics.ApiStatics.*;
 
 public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
 
-    private final static ObjectMapper MAPPER = new ObjectMapper();
+    private final static int JAVALIN_REQUIRED_THREADS = 3;
 
-    private Javalin javalin;
     private ScoreApplication application;
 
     @Override
@@ -26,7 +26,7 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         this.application = application;
         Javalin javalin = Javalin.create(config -> {
             config.server(() -> {
-                Server server = new Server(new ExecutorThreadPool(numberOfHandlerThreads));
+                Server server = new Server(new ExecutorThreadPool(numberOfHandlerThreads + JAVALIN_REQUIRED_THREADS));
                 return server;
             });
         });
@@ -34,8 +34,8 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         javalin.addHandler(HandlerType.PUT, Urls.SUBMIT_SCORE, this::submitScore);
         javalin.addHandler(HandlerType.GET, Urls.GET_TOP_SCORES_LIST, this::getTopScoreList);
         javalin.addHandler(HandlerType.GET, Urls.SEARCH_SCORES_LIST, this::searchScoreList);
+        javalin.exception(Exception.class, this::handleException);
         javalin.start(host, port);
-
     }
 
     private void login(Context ctx) throws Exception {
@@ -64,7 +64,7 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         );
     }
 
-    public void searchScoreList(Context ctx) throws Exception {
+    private void searchScoreList(Context ctx) throws Exception {
         final int top = Integer.parseInt(ctx.queryParam(QueryParams.TOP));
         final int bottom = Integer.parseInt(ctx.queryParam(QueryParams.BOTTOM));
         final String userId = ctx.queryParam(QueryParams.USER_ID);
@@ -72,5 +72,11 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         ctx.result(
                 JsonUtil.toJsonByte(application.searchScoreList(userId, applicationId, top, bottom))
         );
+    }
+
+    private void handleException(Exception e, Context ctx) {
+        ServerExceptionResponse response = ServerExceptionHandler.handle(e);
+        ctx.status(response.getStatus());
+        ctx.result(JsonUtil.toJsonByte(response.getBody()));
     }
 }
