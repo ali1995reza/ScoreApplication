@@ -40,15 +40,15 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
 
     private void login(Context ctx) throws Exception {
         String userId = ctx.pathParam(PathParams.USER_ID);
-        ctx.result(JsonUtil.toJsonByte(new TokenResponse(
+        ctx.result(JsonUtil.toJsonBytes(new TokenResponse(
                 application.login(userId)
         )));
     }
 
     private void submitScore(Context ctx) throws Exception {
-        SubmitScoreRequest request = ctx.bodyStreamAsClass(SubmitScoreRequest.class);
+        SubmitScoreRequest request = JsonUtil.fromBytes(ctx.bodyAsBytes(), SubmitScoreRequest.class);
         String applicationId = ctx.pathParam(PathParams.APPLICATION_ID);
-        ctx.result(JsonUtil.toJsonByte(application.submitScore(
+        ctx.result(JsonUtil.toJsonBytes(application.submitScore(
                 ctx.header(Headers.CLIENT_TOKEN),
                 applicationId,
                 request.getScore())
@@ -60,7 +60,7 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         final long size = Long.parseLong(ctx.queryParam(QueryParams.SIZE));
         final String applicationId = ctx.pathParam(PathParams.APPLICATION_ID);
         ctx.result(
-                JsonUtil.toJsonByte(application.getTopScoreList(applicationId, offset, size))
+                JsonUtil.toJsonBytes(application.getTopScoreList(applicationId, offset, size))
         );
     }
 
@@ -70,13 +70,13 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         final String userId = ctx.queryParam(QueryParams.USER_ID);
         final String applicationId = ctx.pathParam(PathParams.APPLICATION_ID);
         ctx.result(
-                JsonUtil.toJsonByte(application.searchScoreList(userId, applicationId, top, bottom))
+                JsonUtil.toJsonBytes(application.searchScoreList(userId, applicationId, top, bottom))
         );
     }
 
     private void handleException(Exception e, Context ctx) {
         ServerExceptionResponse response = ServerExceptionHandler.handle(e);
         ctx.status(response.getStatus());
-        ctx.result(JsonUtil.toJsonByte(response.getBody()));
+        ctx.result(JsonUtil.toJsonBytes(response.getBody()));
     }
 }

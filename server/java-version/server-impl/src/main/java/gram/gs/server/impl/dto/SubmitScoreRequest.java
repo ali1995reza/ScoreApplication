@@ -2,13 +2,13 @@ package gram.gs.server.impl.dto;
 
 public class SubmitScoreRequest {
 
-    private long score;
+    private Long score;
 
-    public long getScore() {
+    public Long getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(Long score) {
         this.score = score;
     }
 }
