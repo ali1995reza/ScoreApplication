@@ -30,7 +30,7 @@ public class ScoreApplication {
         return authenticationService.createToken(userId, 10, TimeUnit.MINUTES);
     }
 
-    public RankedScore submitScore(final String token, final String applicationId, final int score) throws ScoreApplicationException {
+    public RankedScore submitScore(final String token, final String applicationId, final long score) throws ScoreApplicationException {
         final String userId = authenticationService.validateToken(token);
         //check if asserted user is really exists
         Assert.isNotNull(userRepository.get(userId), AuthenticationTokenInvalidException::new);
@@ -42,7 +42,7 @@ public class ScoreApplication {
         return scoreRepository.save(userId, applicationId, score);
     }
 
-    public List<RankedScore> getTopScoreList(String applicationId, long offset, long size) throws ScoreApplicationException {
+    public List<RankedScore> getTopScoreList(final String applicationId, final long offset, final long size) throws ScoreApplicationException {
         //check if application id is valid
         Assert.isTrue(Utils.isValidApplicationId(applicationId), InvalidApplicationIdFormatException::new);
         Assert.isNotNegative(offset, () -> new InvalidParametersException("[offset] parameter must greater equals than 0"));
@@ -50,7 +50,7 @@ public class ScoreApplication {
         return scoreRepository.get(applicationId, offset, size);
     }
 
-    public List<RankedScore> searchScoreList(String userId, String applicationId, int top, int bottom) throws ScoreApplicationException {
+    public List<RankedScore> searchScoreList(final String userId, final String applicationId, final int top, final int bottom) throws ScoreApplicationException {
         //check if user id and application id is valid
         Assert.isTrue(Utils.isValidUserId(userId), InvalidUserIdFormatException::new);
         Assert.isTrue(Utils.isValidApplicationId(applicationId), InvalidApplicationIdFormatException::new);
@@ -61,7 +61,7 @@ public class ScoreApplication {
         return scores;
     }
 
-    public RankedScore getUserScore(String userId, String applicationId) throws ScoreApplicationException {
+    public RankedScore getUserScore(final String userId, final String applicationId) throws ScoreApplicationException {
         //check if user id and application id is valid
         Assert.isTrue(Utils.isValidUserId(userId), InvalidUserIdFormatException::new);
         Assert.isTrue(Utils.isValidApplicationId(applicationId), InvalidApplicationIdFormatException::new);

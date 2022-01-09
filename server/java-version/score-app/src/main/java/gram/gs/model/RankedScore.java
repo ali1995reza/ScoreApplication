@@ -1,6 +1,6 @@
 package gram.gs.model;
 
-public class RankedScore extends AbstractModel {
+public class RankedScore extends AbstractModel<RankedScore> {
 
     private String userId;
     private String applicationId;
