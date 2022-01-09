@@ -84,7 +84,7 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
     }
 
     private static HttpUriRequest submitRequest(String token, String applicationId, long score) {
-        HttpPut put = new HttpPut("http://localhost:8080/" + applicationId + "/scores");
+        HttpPut put = new HttpPut("http://localhost:8080/applications/" + applicationId + "/scores");
         put.addHeader("X-CLIENT-TOKEN", token);
         try {
             put.setEntity(new ByteArrayEntity(MAPPER.writeValueAsBytes(new SubmitScoreRequestBody(score))));
@@ -96,9 +96,10 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
 
     private static HttpUriRequest getTopScoreRequest(String applicationId, long offset, long size) throws URISyntaxException {
         URI uri = new URIBuilder()
+                .setScheme("http")
                 .setHost("localhost")
                 .setPort(8080)
-                .setPath(applicationId + "/scores")
+                .setPath("applications/" + applicationId + "/scores")
                 .setParameter("offset", String.valueOf(offset))
                 .setParameter("size", String.valueOf(size))
                 .build();
