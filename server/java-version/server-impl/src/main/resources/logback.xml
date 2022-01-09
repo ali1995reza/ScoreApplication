@@ -12,11 +12,6 @@
     </contextListener>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
         <encoder>
             <pattern>%yellow([%d{HH:mm:ss.SSS}]) [%thread] %highlight(%-5level) %cyan([%logger{36}]) : %msg%n</pattern>
         </encoder>
