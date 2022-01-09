@@ -1,4 +1,4 @@
-package gram.gs.client;
+package gram.gs.client.cli;
 
 import org.apache.commons.cli.*;
 

@@ -1,4 +1,4 @@
-package gram.gs.client;
+package gram.gs.client.cli;
 
 import gram.gs.client.util.NumericParser;
 import org.apache.commons.cli.*;
@@ -17,8 +17,8 @@ public class GetTopScoreCommand {
         try {
             CommandLine commandLine = PARSER.parse(GET_TOP_SCORE_OPTIONS, args);
             final String applicationId = commandLine.getOptionValue(APP_ID_OPTION);
-            final Long offset = NumericParser.parseLong(commandLine.getOptionValue(OFFSET_OPTION), 0l, "offset");
-            final Long size = NumericParser.parseLong(commandLine.getOptionValue(SIZE_OPTION), 0l, "size");
+            final Long offset = NumericParser.parseLong(commandLine.getOptionValue(OFFSET_OPTION), 0L, "offset");
+            final Long size = NumericParser.parseLong(commandLine.getOptionValue(SIZE_OPTION), 0L, "size");
             return new GetTopScoreCommand(applicationId, offset, size);
         } catch (ParseException e) {
             throw new IllegalStateException(e);

@@ -1,4 +1,4 @@
-package gram.gs.client;
+package gram.gs.client.cli;
 
 import dnl.utils.text.table.TextTable;
 import gram.gs.client.abs.ScoreApplicationClient;

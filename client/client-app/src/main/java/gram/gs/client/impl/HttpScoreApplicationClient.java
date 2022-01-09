@@ -23,7 +23,7 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
     private final static ObjectMapper MAPPER = new ObjectMapper();
     private final static TypeReference<ClientToken> CLIENT_TOKEN_TYPE = SimpleTypeReference.of(ClientToken.class);
     private final static TypeReference<RankedScore> RANKED_SCORE_TYPE = SimpleTypeReference.of(RankedScore.class);
-    private final static TypeReference<List<RankedScore>> RANK_LIST_TYPE = new TypeReference<List<RankedScore>>() {
+    private final static TypeReference<List<RankedScore>> RANK_LIST_TYPE = new TypeReference<>() {
     };
 
     private final HttpAsyncClient client;
@@ -117,7 +117,6 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
                 .setParameter("bottom", String.valueOf(bottom))
                 .setHost("localhost")
                 .build();
-        System.out.println(uri);
         return new HttpGet(uri);
     }
 }

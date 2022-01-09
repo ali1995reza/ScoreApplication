@@ -1,6 +1,6 @@
 package gram.gs.client.impl;
 
-public class ScoreServerError extends Exception {
+public class ScoreServerError extends RuntimeException {
 
     private String id;
     private String message;
@@ -48,6 +48,6 @@ public class ScoreServerError extends Exception {
 
     @Override
     public String getLocalizedMessage() {
-        return "[id : "+id+", message : "+getMessage()+", traceId : "+traceId+"]";
+        return "[id : " + id + ", message : " + getMessage() + ", traceId : " + traceId + "]";
     }
 }

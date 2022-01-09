@@ -1,4 +1,4 @@
-package gram.gs.client;
+package gram.gs.client.cli;
 
 import gram.gs.client.util.NumericParser;
 import org.apache.commons.cli.*;
