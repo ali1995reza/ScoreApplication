@@ -35,13 +35,13 @@ public class ServerExceptionHandler {
                 response.status(NOT_FOUND_HTTP_STATUS);
             }
             response.status(BAD_REQUEST_HTTP_STATUS);
-            LOGGER.warn("[{}] : \r\n {}", response.getBody().getId(), getStackTrace(e));
+            LOGGER.warn("[{}]\r\n {}", response.getBody().getId(), getStackTrace(e));
             return response;
         } else {
             ServerExceptionResponse response = new ServerExceptionResponse();
             response.body(getInternalServerExceptionBody())
                     .status(INTERNAL_SERVER_ERROR_HTTP_STATUS);
-            LOGGER.error("[{}] : \r\n {}", response.getBody().getId(), getStackTrace(e));
+            LOGGER.error("[{}]\r\n {}", response.getBody().getId(), getStackTrace(e));
             return response;
         }
     }
