@@ -15,7 +15,7 @@ public class RunServer {
                 .application(new ScoreApplication(new InMemoryUserRepository(), new InMemoryScoreRepository(), new JwtAuthenticationToken(
                         Algorithm.HMAC512("secret")
                 )))
-                .numberOfHandlerThreads(1)
+                .numberOfHandlerThreads(10)
                 .host("localhost")
                 .port(8080)
                 .start();
