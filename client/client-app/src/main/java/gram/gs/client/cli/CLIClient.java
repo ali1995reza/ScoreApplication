@@ -17,7 +17,7 @@ public class CLIClient {
     public static void main(String[] args) {
         CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault();
         httpClient.start();
-        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient);
+        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient, host, port);
 
         final Scanner input = new Scanner(System.in);
 

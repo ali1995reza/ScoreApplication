@@ -11,8 +11,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,10 +27,14 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
     private final static TypeReference<List<RankedScore>> RANK_LIST_TYPE = new TypeReference<>() {
     };
 
-    private final HttpAsyncClient client;
+    private final CloseableHttpAsyncClient client;
+    private final String host;
+    private final int port;
 
-    public HttpScoreApplicationClient(HttpAsyncClient client) {
+    public HttpScoreApplicationClient(CloseableHttpAsyncClient client, String host, int port) {
         this.client = client;
+        this.host = host;
+        this.port = port;
     }
 
 
@@ -78,13 +83,33 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
         return future;
     }
 
-
-    private static HttpUriRequest loginRequest(String userId) {
-        return new HttpGet("http://localhost:8080/login/" + userId);
+    @Override
+    public void close() {
+        try {
+            client.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
-    private static HttpUriRequest submitRequest(String token, String applicationId, long score) {
-        HttpPut put = new HttpPut("http://localhost:8080/applications/" + applicationId + "/scores");
+    private HttpUriRequest loginRequest(String userId) throws URISyntaxException {
+        URI uri = new URIBuilder()
+                .setScheme("http")
+                .setHost(host)
+                .setPort(port)
+                .setPath("login/"+userId)
+                .build();
+        return new HttpGet(uri);
+    }
+
+    private HttpUriRequest submitRequest(String token, String applicationId, long score) throws URISyntaxException {
+        URI uri = new URIBuilder()
+                .setScheme("http")
+                .setHost(host)
+                .setPort(port)
+                .setPath("applications/"+applicationId+"/scores")
+                .build();
+        HttpPut put = new HttpPut(uri);
         put.addHeader("X-CLIENT-TOKEN", token);
         try {
             put.setEntity(new ByteArrayEntity(MAPPER.writeValueAsBytes(new SubmitScoreRequestBody(score))));
@@ -94,28 +119,27 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
         return put;
     }
 
-    private static HttpUriRequest getTopScoreRequest(String applicationId, long offset, long size) throws URISyntaxException {
+    private HttpUriRequest getTopScoreRequest(String applicationId, long offset, long size) throws URISyntaxException {
         URI uri = new URIBuilder()
                 .setScheme("http")
-                .setHost("localhost")
-                .setPort(8080)
-                .setPath("applications/" + applicationId + "/scores")
+                .setHost(host)
+                .setPort(port)
+                .setPath("applications/"+applicationId+"/scores")
                 .setParameter("offset", String.valueOf(offset))
                 .setParameter("size", String.valueOf(size))
                 .build();
         return new HttpGet(uri);
     }
 
-    private static HttpUriRequest searchScoreRequest(String userId, String applicationId, int top, int bottom) throws URISyntaxException {
+    private HttpUriRequest searchScoreRequest(String userId, String applicationId, int top, int bottom) throws URISyntaxException {
         URI uri = new URIBuilder()
                 .setScheme("http")
-                .setHost("localhost")
-                .setPort(8080)
-                .setPath("applications/" + applicationId + "/scores/search")
+                .setHost(host)
+                .setPort(port)
+                .setPath("applications/"+applicationId+"/scores/search")
                 .setParameter("userId", userId)
                 .setParameter("top", String.valueOf(top))
                 .setParameter("bottom", String.valueOf(bottom))
-                .setHost("localhost")
                 .build();
         return new HttpGet(uri);
     }

@@ -15,4 +15,6 @@ public interface ScoreApplicationClient {
     CompletableFuture<List<RankedScore>> getTopScoreList(String applicationId, long offset, long size);
 
     CompletableFuture<List<RankedScore>> searchScoreList(String userId, String applicationId, int top, int bottom);
+
+    void close();
 }

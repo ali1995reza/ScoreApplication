@@ -1,6 +1,5 @@
 package gram.gs.client.load;
 
-import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 import gram.gs.client.abs.ScoreApplicationClient;
 import gram.gs.client.impl.HttpScoreApplicationClient;
@@ -111,7 +110,7 @@ public class LoadTestScenario {
                                 .build()
                 ).build();
         httpClient.start();
-        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient);
+        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient, host, port);
         final ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
         final LoadTestMetrics testMetrics = LoadTestMetrics.from(metrics);
         final LoadContext context = new LoadContext(numberOfUsers, numberOfApplications);
