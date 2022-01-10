@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gram.gs.client.abs.ScoreApplicationClient;
 import gram.gs.client.abs.dto.ClientToken;
 import gram.gs.client.abs.dto.RankedScore;
+import gram.gs.client.assertion.Assert;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,9 +34,17 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
     private final int port;
 
     public HttpScoreApplicationClient(CloseableHttpAsyncClient client, String host, int port) {
+        this.validate(host, port);
         this.client = client;
         this.host = host;
         this.port = port;
+        if (!client.isRunning()) {
+            client.start();
+        }
+    }
+
+    public HttpScoreApplicationClient(String host, int port) {
+        this(HttpAsyncClients.createDefault(), host, port);
     }
 
 
@@ -92,12 +102,25 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
         }
     }
 
+    private void validate(String host, int port) {
+        try {
+            new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPort(port)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("invalid host name [" + host + "]");
+        }
+        Assert.isTrue(port > 0 && port < 65535, () -> new IllegalArgumentException("invalid port [" + port + "]"));
+    }
+
     private HttpUriRequest loginRequest(String userId) throws URISyntaxException {
         URI uri = new URIBuilder()
                 .setScheme("http")
                 .setHost(host)
                 .setPort(port)
-                .setPath("login/"+userId)
+                .setPath("login/" + userId)
                 .build();
         return new HttpGet(uri);
     }
@@ -107,7 +130,7 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
                 .setScheme("http")
                 .setHost(host)
                 .setPort(port)
-                .setPath("applications/"+applicationId+"/scores")
+                .setPath("applications/" + applicationId + "/scores")
                 .build();
         HttpPut put = new HttpPut(uri);
         put.addHeader("X-CLIENT-TOKEN", token);
@@ -124,7 +147,7 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
                 .setScheme("http")
                 .setHost(host)
                 .setPort(port)
-                .setPath("applications/"+applicationId+"/scores")
+                .setPath("applications/" + applicationId + "/scores")
                 .setParameter("offset", String.valueOf(offset))
                 .setParameter("size", String.valueOf(size))
                 .build();
@@ -136,7 +159,7 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
                 .setScheme("http")
                 .setHost(host)
                 .setPort(port)
-                .setPath("applications/"+applicationId+"/scores/search")
+                .setPath("applications/" + applicationId + "/scores/search")
                 .setParameter("userId", userId)
                 .setParameter("top", String.valueOf(top))
                 .setParameter("bottom", String.valueOf(bottom))

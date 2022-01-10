@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 public class LoadTestScenario {
 
-    public static Builder newBuilder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -109,16 +109,15 @@ public class LoadTestScenario {
                                 .setIoThreadCount(numberOfThreads)
                                 .build()
                 ).build();
-        httpClient.start();
-        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient, host, port);
+        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient, "localhost", 8080);
         final ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
         final LoadTestMetrics testMetrics = LoadTestMetrics.from(metrics);
         final LoadContext context = new LoadContext(numberOfUsers, numberOfApplications);
         final CountDownLatch remainingThreads = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             executor.execute(
-                    LoadClient
-                            .newBuilder(client)
+                    LoadTestClient
+                            .builder(client)
                             .submitTimer(testMetrics.getSubmitTimer())
                             .getListTimer(testMetrics.getGetListTimer())
                             .searchTimer(testMetrics.getSearchTimer())
@@ -129,28 +128,29 @@ public class LoadTestScenario {
                             .whenDone(remainingThreads::countDown)
                             .build()
             );
-            while (remainingThreads.getCount() > 0) {
-
-                try {
-                    wait(updatePeriod, unit);
-                    listener.accept(testMetrics);
-                } catch (Exception e) {
-                    try {
-                        httpClient.close();
-                    } catch (IOException ex) {
-                    }
-                    executor.shutdownNow();
-                    throw new IllegalStateException(e);
-                }
-
-            }
-
-            try {
-                httpClient.close();
-            } catch (IOException ex) {
-            }
-            executor.shutdownNow();
         }
+
+
+        while (remainingThreads.getCount() > 0) {
+            try {
+                wait(updatePeriod, unit);
+                listener.accept(testMetrics);
+            } catch (Exception e) {
+                try {
+                    httpClient.close();
+                } catch (IOException ex) {
+                }
+                executor.shutdownNow();
+                throw new IllegalStateException(e);
+            }
+
+        }
+
+        try {
+            httpClient.close();
+        } catch (IOException ex) {
+        }
+        executor.shutdownNow();
     }
 
     private static void wait(long time, TimeUnit unit) throws InterruptedException {

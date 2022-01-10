@@ -4,77 +4,151 @@ import dnl.utils.text.table.TextTable;
 import gram.gs.client.abs.ScoreApplicationClient;
 import gram.gs.client.abs.dto.ClientToken;
 import gram.gs.client.abs.dto.RankedScore;
+import gram.gs.client.cli.commands.*;
+import gram.gs.client.command.parser.CommandParser;
+import gram.gs.client.command.parser.builder.CommandParserBuilder;
+import gram.gs.client.command.standard.ExitCommand;
+import gram.gs.client.command.standard.HelpCommand;
 import gram.gs.client.impl.HttpScoreApplicationClient;
-import gram.gs.client.util.ConsoleUtils;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
+import gram.gs.client.load.LoadTestScenario;
 
 import java.util.List;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class CLIClient {
 
-    public static void main(String[] args) {
-        CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault();
-        httpClient.start();
-        ScoreApplicationClient client = new HttpScoreApplicationClient(httpClient, host, port);
+    private final CommandParser commandParser;
+    private final ScoreApplicationClient client;
+    private ClientToken token;
+    private String currentUser;
 
-        final Scanner input = new Scanner(System.in);
 
-        ClientToken token = null;
-        String userId = null;
+    public CLIClient(String host, int port) {
+        commandParser = CommandParserBuilder
+                .builder()
+                .add(LoginCommand.class)
+                .add(LogoutCommand.class)
+                .add(SearchScoreCommand.class)
+                .add(SubmitScoreCommand.class)
+                .add(GetTopScoreCommand.class)
+                .add(LoadTestCommand.class)
+                .add(ExitCommand.class)
+                .add(HelpCommand.class)
+                .build()
+                .setCommandHandler(LoginCommand.class, this::handleLogin)
+                .setCommandHandler(LogoutCommand.class, this::handleLogout)
+                .setCommandHandler(SearchScoreCommand.class, this::handleSearchScore)
+                .setCommandHandler(SubmitScoreCommand.class, this::handleSubmitScore)
+                .setCommandHandler(GetTopScoreCommand.class, this::handleGetTopScoreList)
+                .setCommandHandler(LoadTestCommand.class, this::handleLoadTest);
 
+        client = new HttpScoreApplicationClient(host, port);
+    }
+
+    public synchronized int run(Supplier<String> commandSupplier) {
         while (true) {
-            printInterceptorLine(userId);
-            String[] commandLine = input.nextLine().split("\\s+");
-            String commandName = commandLine[0];
+            printCommandInterceptor();
+            String command = commandSupplier.get();
             try {
-                if (commandName.equals("login")) {
-                    LoginCommand command = LoginCommand.parse(chunk(commandLine, 1));
-                    token = client.login(command.getUserId()).get();
-                    System.out.println("logged in as : " + command.getUserId());
-                    userId = command.getUserId();
-                } else if (commandName.equals("submit")) {
-                    SubmitScoreCommand command = SubmitScoreCommand.parse(chunk(commandLine, 1));
-                    if (token == null) {
-                        throw new IllegalStateException("first login !");
-                    }
-                    RankedScore score =
-                            client.submitScore(token.getToken(), command.getApplicationId(), command.getScore()).get();
-                    printInTable(List.of(score));
-                } else if (commandName.equals("get")) {
-                    GetTopScoreCommand command = GetTopScoreCommand.parse(chunk(commandLine, 1));
-                    List<RankedScore> scores =
-                            client.getTopScoreList(command.getApplicationId(), command.getOffset(), command.getSize()).get();
-                    printInTable(scores);
-                } else if (commandName.equals("search")) {
-                    SearchScoreCommand command = SearchScoreCommand.parse(chunk(commandLine, 1));
-                    List<RankedScore> scores =
-                            client.searchScoreList(command.getUserId(), command.getApplicationId(), command.getTop(), command.getBottom()).get();
-                    printInTable(scores);
-                } else if (commandName.equals("logout")) {
-                    if(token == null) {
-                        throw new IllegalStateException("you are not logged in");
-                    }
-                    token = null;
-                    userId = null;
-                } else if (commandName.equals("clear") || commandName.equals("cls")) {
-                    ConsoleUtils.clear();
+                Object commandObject = commandParser.parse(command);
+                if (commandObject instanceof ExitCommand) {
+                    ExitCommand exitCommand = (ExitCommand) commandObject;
+                    return exitCommand.getCode();
                 }
             } catch (Exception e) {
                 System.out.println("ERROR : " + e.getMessage());
+                System.out.println();
             }
         }
     }
 
-    private static String[] chunk(String[] strings, int offset, int len) {
-        String[] chunk = new String[len];
-        System.arraycopy(strings, offset, chunk, 0, len);
-        return chunk;
+    private void printCommandInterceptor() {
+        if (token == null) {
+            System.out.print("- >> ");
+        } else {
+            System.out.print(currentUser + " >> ");
+        }
     }
 
-    private static String[] chunk(String[] strings, int offset) {
-        return chunk(strings, offset, strings.length - offset);
+    private void handleLogin(LoginCommand command) throws Exception {
+        long start = System.currentTimeMillis();
+        this.token = client.login(command.getUserId()).get();
+        long end = System.currentTimeMillis();
+        this.currentUser = command.getUserId();
+        System.out.println("Logged id as : " + currentUser);
+        System.out.println("Execution time : " + (end - start) + " milliseconds");
+        System.out.println();
+    }
+
+    private void handleLogout(LogoutCommand command) throws Exception {
+        long start = System.currentTimeMillis();
+        this.token = null;
+        this.currentUser = null;
+        long end = System.currentTimeMillis();
+        System.out.println("Logout !");
+        System.out.println("Execution time : " + (end - start) + " milliseconds");
+        System.out.println();
+    }
+
+    private void handleGetTopScoreList(GetTopScoreCommand command) throws Exception {
+        long start = System.currentTimeMillis();
+        List<RankedScore> scores = client.getTopScoreList(
+                command.getApplicationId(),
+                command.getOffset(),
+                command.getSize()
+        ).get();
+        long end = System.currentTimeMillis();
+        printInTable(scores);
+        System.out.println("Execution time : " + (end - start) + " milliseconds");
+        System.out.println();
+    }
+
+    private void handleSearchScore(SearchScoreCommand command) throws Exception {
+        long start = System.currentTimeMillis();
+        List<RankedScore> scores = client.searchScoreList(
+                command.getUserId(),
+                command.getApplicationId(),
+                command.getTop(),
+                command.getTop()
+        ).get();
+        long end = System.currentTimeMillis();
+        printInTable(scores);
+        System.out.println("Execution time : " + (end - start) + " milliseconds");
+        System.out.println();
+    }
+
+    private void handleSubmitScore(SubmitScoreCommand command) throws Exception {
+        long start = System.currentTimeMillis();
+        if (token == null) {
+            throw new IllegalStateException("please login first !");
+        }
+        RankedScore score = client.submitScore(
+                token.getToken(),
+                command.getApplicationId(),
+                command.getScore()
+        ).get();
+        long end = System.currentTimeMillis();
+        printInTable(List.of(score));
+        System.out.println("Execution time : " + (end - start) + " milliseconds");
+        System.out.println();
+    }
+
+    private void handleLoadTest(LoadTestCommand command) {
+        try {
+            LoadTestScenario.builder()
+                    .numberOfUsers(command.getNumberOfUsers())
+                    .numberOfApplications(command.getNumberOfApplications())
+                    .numberOfThreads(command.getNumberOfThreads())
+                    .requestPerThread(command.getRequestPerThread())
+                    .build()
+                    .run(command.getUpdatePeriod(), TimeUnit.SECONDS, (metrics) -> {
+                        System.out.println(metrics.getSuccessRequestCounter().getCount());
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     private static void printInTable(List<RankedScore> scores) {
@@ -90,11 +164,4 @@ public class CLIClient {
         System.out.println();
     }
 
-    private static void printInterceptorLine(String userId) {
-        if (userId == null) {
-            System.out.print("- >> ");
-        } else {
-            System.out.print(userId + " >> ");
-        }
-    }
 }

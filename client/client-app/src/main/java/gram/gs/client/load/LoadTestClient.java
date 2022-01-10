@@ -8,9 +8,9 @@ import gram.gs.client.impl.ScoreServerError;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-final class LoadClient implements Runnable {
+final class LoadTestClient implements Runnable {
 
-    public static Builder newBuilder(ScoreApplicationClient client) {
+    public static Builder builder(ScoreApplicationClient client) {
         return new Builder(client);
     }
 
@@ -137,8 +137,8 @@ final class LoadClient implements Runnable {
             return this;
         }
 
-        public LoadClient build() {
-            return new LoadClient(client,
+        public LoadTestClient build() {
+            return new LoadTestClient(client,
                     submitTimer,
                     getListTimer,
                     searchTimer,
@@ -166,7 +166,7 @@ final class LoadClient implements Runnable {
     private final Runnable whenDoneListener;
     private Random random = new Random();
 
-    private LoadClient(ScoreApplicationClient client, Timer submitTimer, Timer getListTimer, Timer searchTimer, int totalRequests, Counter exceptionRequestCounter, Counter successRequestCounter, LoadContext context, Runnable whenDoneListener) {
+    private LoadTestClient(ScoreApplicationClient client, Timer submitTimer, Timer getListTimer, Timer searchTimer, int totalRequests, Counter exceptionRequestCounter, Counter successRequestCounter, LoadContext context, Runnable whenDoneListener) {
         this.client = client;
         this.submitTimer = submitTimer;
         this.getListTimer = getListTimer;
