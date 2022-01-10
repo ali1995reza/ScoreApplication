@@ -8,7 +8,7 @@ import gram.gs.client.impl.ScoreServerError;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-public class LoadClient implements Runnable {
+final class LoadClient implements Runnable {
 
     public static Builder newBuilder(ScoreApplicationClient client) {
         return new Builder(client);
@@ -195,7 +195,7 @@ public class LoadClient implements Runnable {
                 case CALL_SUBMIT:
                     long score = lastScore + random.nextInt(4) + 1;
                     try (Timer.Context time = submitTimer.time()) {
-                        lastScore = client.submitScore(context.getRandomToken(), context.getRandomApplicationId(), score).get().getScore();
+                        lastScore = client.submitScore(context.getRandomToken(client), context.getRandomApplicationId(), score).get().getScore();
                         successRequestCounter.inc();
                     } catch (ExecutionException e) {
                         if (e.getCause() instanceof ScoreServerError) {

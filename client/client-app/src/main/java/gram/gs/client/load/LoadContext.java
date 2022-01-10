@@ -6,17 +6,15 @@ import gram.gs.client.abs.dto.RankedScore;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LoadContext {
+final class LoadContext {
 
-    private final ScoreApplicationClient client;
     private final ConcurrentHashMap<Integer, String> tokens;
     private final ConcurrentHashMap<Integer, RankedScore> lsatSubmittedScore;
     private final int numberOfUsers;
     private final int numberOfApps;
     private final Random random = new Random();
 
-    public LoadContext(ScoreApplicationClient client, int numberOfUsers, int numberOfApps) {
-        this.client = client;
+    public LoadContext(int numberOfUsers, int numberOfApps) {
         this.tokens = new ConcurrentHashMap<>();
         this.lsatSubmittedScore = new ConcurrentHashMap<>();
         this.numberOfUsers = numberOfUsers;
@@ -24,8 +22,8 @@ public class LoadContext {
 
     }
 
-    public String getRandomToken() {
-        return getTokenFor(random.nextInt(numberOfUsers));
+    public String getRandomToken(ScoreApplicationClient client) {
+        return getTokenFor(random.nextInt(numberOfUsers), client);
     }
 
     public String getRandomUserId() {
@@ -36,7 +34,7 @@ public class LoadContext {
         return "APP-" + (random.nextInt(numberOfApps) + 1);
     }
 
-    private String getTokenFor(int userIndex) {
+    private String getTokenFor(int userIndex, ScoreApplicationClient client) {
         return tokens.computeIfAbsent(userIndex, (index) -> {
             try {
                 return client.login("USER-" + index).get().getToken();
