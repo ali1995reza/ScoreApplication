@@ -2,3 +2,4 @@
 .idea/
 # Ignore run-server.exe which is executable version of server
 /run-server.exe
+/run-server
