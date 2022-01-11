@@ -1,6 +1,8 @@
 package service
 
-import "impl-score-app-server/abstract/exceptions"
+import (
+	"impl-score-app-server/score-app/abstract/exceptions"
+)
 
 type AuthenticationService interface {
 	CreateToken(userId string, expireAfter int64) *string

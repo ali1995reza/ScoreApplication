@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"impl-score-app-server/abstract/exceptions"
-	"impl-score-app-server/abstract/models"
+	"impl-score-app-server/score-app/abstract/exceptions"
+	"impl-score-app-server/score-app/abstract/models"
 )
 
 type UserRepository interface {
