@@ -12,14 +12,15 @@ type ScoreApplication struct {
 	authenticationService service.AuthenticationService
 	userRepository        repository.UserRepository
 	scoreRepository       repository.ScoreRepository
+	validator             validation.Validator
 }
 
 func NewScoreApplication(authenticationService service.AuthenticationService, userRepository repository.UserRepository, scoreRepository repository.ScoreRepository) *ScoreApplication {
-	return &ScoreApplication{authenticationService: authenticationService, userRepository: userRepository, scoreRepository: scoreRepository}
+	return &ScoreApplication{authenticationService: authenticationService, userRepository: userRepository, scoreRepository: scoreRepository, validator: *validation.NewValidator()}
 }
 
 func (app *ScoreApplication) Login(userId string) (*string, exceptions.ScoreApplicationException) {
-	if validation.IsValidUserId(userId) {
+	if !app.validator.IsValidUserId(userId) {
 		return nil, exceptions.NewInvalidUserIdFormatException("user id format invalid")
 	}
 	app.userRepository.AddOrGet(userId)
@@ -35,24 +36,24 @@ func (app *ScoreApplication) SubmitScore(token string, applicationId string, sco
 	if user == nil {
 		return nil, exceptions.NewAuthenticationTokenInvalidException("user not found")
 	}
-	if validation.IsValidApplicationId(applicationId) {
+	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
 	return app.scoreRepository.Save(*userId, applicationId, score), nil
 }
 
 func (app *ScoreApplication) GetTopScoreList(applicationId string, offset int64, size int64) ([]*models.RankedScore, exceptions.ScoreApplicationException) {
-	if validation.IsValidApplicationId(applicationId) {
+	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
 	return app.scoreRepository.GetTopScore(applicationId, offset, size), nil
 }
 
 func (app *ScoreApplication) Search(userId string, applicationId string, top int32, bottom int32) ([]*models.RankedScore, exceptions.ScoreApplicationException) {
-	if validation.IsValidUserId(userId) {
+	if !app.validator.IsValidUserId(userId) {
 		return nil, exceptions.NewInvalidUserIdFormatException("user id format invalid")
 	}
-	if validation.IsValidApplicationId(applicationId) {
+	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
 	result := app.scoreRepository.Search(userId, applicationId, top, bottom)
