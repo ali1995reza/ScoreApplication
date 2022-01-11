@@ -21,8 +21,8 @@ func NewScoreApplicationServer(address string, application *score_app.ScoreAppli
 func (server *ScoreApplicationServer) Run() {
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
-	router.GET(URL_LOGIN, func(context *gin.Context) {
-		userId := context.Param(PATH_PARAM_USER_ID)
+	router.GET(UrlLogin, func(context *gin.Context) {
+		userId := context.Param(PathParamUserId)
 		token, error := server.application.Login(userId)
 		if error != nil {
 			context.JSON(http.StatusBadRequest, errorResponseFrom(error))
@@ -30,16 +30,16 @@ func (server *ScoreApplicationServer) Run() {
 			context.JSON(http.StatusOK, ClientToken{Token: *token})
 		}
 	})
-	router.GET(URL_GET_TOP_SCORE_LIST, func(context *gin.Context) {
-		applicationId := context.Param(PATH_PARAM_APPLICATION_ID)
-		offset, parseErr := strconv.ParseInt(context.Query(QUERY_PARAM_OFFSET), 10, 64)
+	router.GET(UrlGetTopScoreList, func(context *gin.Context) {
+		applicationId := context.Param(PathParamApplicationId)
+		offset, parseErr := strconv.ParseInt(context.Query(QueryParamOffset), 10, 64)
 		if parseErr != nil {
-			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QUERY_PARAM_OFFSET+"] is invalid or not exists")))
+			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QueryParamOffset+"] is invalid or not exists")))
 			return
 		}
-		size, parseErr := strconv.ParseInt(context.Query(QUERY_PARAM_SIZE), 10, 64)
+		size, parseErr := strconv.ParseInt(context.Query(QueryParamSize), 10, 64)
 		if parseErr != nil {
-			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QUERY_PARAM_SIZE+"] is invalid or not exists")))
+			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QueryParamSize+"] is invalid or not exists")))
 			return
 		}
 		result, err := server.application.GetTopScoreList(applicationId, offset, size)
@@ -49,9 +49,9 @@ func (server *ScoreApplicationServer) Run() {
 		}
 		context.JSON(http.StatusOK, result)
 	})
-	router.PUT(URL_SUBMIT_SCORE, func(context *gin.Context) {
-		applicationId := context.Param(PATH_PARAM_APPLICATION_ID)
-		token := context.GetHeader(HEADER_CLIENT_TOKEN)
+	router.PUT(UrlSubmitScore, func(context *gin.Context) {
+		applicationId := context.Param(PathParamApplicationId)
+		token := context.GetHeader(HeaderClientToken)
 		var request SubmitScoreRequest
 		jsonParseErr := context.BindJSON(&request)
 		if jsonParseErr != nil {
@@ -64,19 +64,19 @@ func (server *ScoreApplicationServer) Run() {
 		}
 		context.JSON(http.StatusOK, result)
 	})
-	router.GET(URL_SEARCH_SCORE_LIST, func(context *gin.Context) {
-		applicationId := context.Param(PATH_PARAM_APPLICATION_ID)
-		top, parseErr := strconv.ParseInt(context.Query(QUERY_PARAM_TOP), 10, 64)
+	router.GET(UrlSearchScoreList, func(context *gin.Context) {
+		applicationId := context.Param(PathParamApplicationId)
+		top, parseErr := strconv.ParseInt(context.Query(QueryParamTop), 10, 64)
 		if parseErr != nil {
-			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QUERY_PARAM_TOP+"] is invalid or not exists")))
+			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QueryParamTop+"] is invalid or not exists")))
 			return
 		}
-		bottom, parseErr := strconv.ParseInt(context.Query(QUERY_PARAM_BOTTOM), 10, 64)
+		bottom, parseErr := strconv.ParseInt(context.Query(QueryParamBottom), 10, 64)
 		if parseErr != nil {
-			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QUERY_PARAM_BOTTOM+"] is invalid or not exists")))
+			context.JSON(http.StatusBadRequest, errorResponseFrom(exceptions.NewInvalidParametersException("parameter ["+QueryParamBottom+"] is invalid or not exists")))
 			return
 		}
-		userId := context.Query(QUERY_PARAM_USER_ID)
+		userId := context.Query(QueryParamUserId)
 		result, err := server.application.Search(userId, applicationId, int32(top), int32(bottom))
 		if err != nil {
 			if _, ok := err.(*exceptions.ScoreNotFoundException); ok {
