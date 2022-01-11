@@ -1,0 +1,4 @@
+# Ignore intellij idea files
+.idea/
+# Ignore run-server.exe which is executable version of server
+/run-server.exe
