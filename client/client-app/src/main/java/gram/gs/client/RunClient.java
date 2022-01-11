@@ -8,10 +8,8 @@ public class RunClient {
 
     public static void main(String[] args) throws Exception {
         Scanner input = new Scanner(System.in);
-        System.out.print("Hostname : ");
-        String host = input.nextLine();
-        System.out.print("Port : ");
-        int port = Integer.parseInt(input.nextLine());
+        String host = InputUtils.getString("Server Host", "please enter a valid host", s -> !s.isBlank(), input);
+        int port = InputUtils.getInteger("Server Port", "please enter a valid number int [0, 65535]", i -> i > 0 && i < 65535, input);
         int exitCode = new CLIClient(host, port).run(input::nextLine);
         System.exit(exitCode);
     }

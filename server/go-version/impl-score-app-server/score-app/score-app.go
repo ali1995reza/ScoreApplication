@@ -46,6 +46,12 @@ func (app *ScoreApplication) GetTopScoreList(applicationId string, offset int64,
 	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
+	if offset < 0 {
+		return nil, exceptions.NewInvalidParametersException("[offset] can not be negative")
+	}
+	if size < 1 {
+		return nil, exceptions.NewInvalidParametersException("[size] must be grater than equal 1")
+	}
 	return app.scoreRepository.GetTopScore(applicationId, offset, size), nil
 }
 
@@ -55,6 +61,12 @@ func (app *ScoreApplication) Search(userId string, applicationId string, top int
 	}
 	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
+	}
+	if top < 0 {
+		return nil, exceptions.NewInvalidParametersException("[top] can not be negative")
+	}
+	if bottom < 0 {
+		return nil, exceptions.NewInvalidParametersException("[bottom] can not be negative")
 	}
 	result := app.scoreRepository.Search(userId, applicationId, top, bottom)
 	if result == nil {
