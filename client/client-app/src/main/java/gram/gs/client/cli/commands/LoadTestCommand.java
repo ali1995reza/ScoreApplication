@@ -6,15 +6,15 @@ import gram.gs.client.command.annoations.CommandOption;
 @Command("load")
 public class LoadTestCommand {
 
-    @CommandOption(longName = "nusers", shortName = "nu")
+    @CommandOption(longName = "nusers", shortName = "nu", description = "number of simulated users")
     private int numberOfUsers;
-    @CommandOption(longName = "napps", shortName = "na")
+    @CommandOption(longName = "napps", shortName = "na", description = "number of simulated apps")
     private int numberOfApplications;
-    @CommandOption(longName = "nthreads", shortName = "nt")
+    @CommandOption(longName = "nthreads", shortName = "nt", description = "number of parallel threads that send requests to server")
     private int numberOfThreads;
-    @CommandOption(longName = "nrequests", shortName = "nr")
+    @CommandOption(longName = "nrequests", shortName = "nr", description = "number of request that each thread will send. total-requests = nt*nr")
     private int requestPerThread;
-    @CommandOption(longName = "uperiod", shortName = "up", required = false)
+    @CommandOption(longName = "uperiod", shortName = "up", required = false, description = "statistic print-period time in seconds. default = 1")
     private int updatePeriod = 1;
 
     public int getNumberOfUsers() {

@@ -1,5 +1,6 @@
 package gram.gs.client.cli;
 
+import com.codahale.metrics.Timer;
 import dnl.utils.text.table.TextTable;
 import gram.gs.client.abs.ScoreApplicationClient;
 import gram.gs.client.abs.dto.ClientToken;
@@ -10,13 +11,27 @@ import gram.gs.client.command.parser.builder.CommandParserBuilder;
 import gram.gs.client.command.standard.ExitCommand;
 import gram.gs.client.command.standard.HelpCommand;
 import gram.gs.client.impl.HttpScoreApplicationClient;
+import gram.gs.client.load.LoadTestMetrics;
 import gram.gs.client.load.LoadTestScenario;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 public class CLIClient {
+
+    private final static String[] LOAD_TEST_TABLE_HEADERS = new String[]{
+            " Method ",
+            " Total Calls ",
+            " Mean Time [ms]",
+            " Maximum Time [ms]",
+            " Minimum Time [ms]",
+            " Mean Rate [call/sec]",
+            " 1 Min Rate [call/sec]",
+            " 5 Min Rate [call/sec]"
+    };
+    private final static DecimalFormat FMT = new DecimalFormat("0.00");
 
     private final CommandParser commandParser;
     private final ScoreApplicationClient client;
@@ -77,18 +92,19 @@ public class CLIClient {
         long end = System.currentTimeMillis();
         this.currentUser = command.getUserId();
         System.out.println("Logged id as : " + currentUser);
-        System.out.println("Execution time : " + (end - start) + " milliseconds");
-        System.out.println();
+        printTime(end - start);
     }
 
     private void handleLogout(LogoutCommand command) throws Exception {
         long start = System.currentTimeMillis();
+        if (token == null) {
+            throw new IllegalStateException("you are not logged in !");
+        }
         this.token = null;
         this.currentUser = null;
         long end = System.currentTimeMillis();
         System.out.println("Logout !");
-        System.out.println("Execution time : " + (end - start) + " milliseconds");
-        System.out.println();
+        printTime(end - start);
     }
 
     private void handleGetTopScoreList(GetTopScoreCommand command) throws Exception {
@@ -100,8 +116,7 @@ public class CLIClient {
         ).get();
         long end = System.currentTimeMillis();
         printInTable(scores);
-        System.out.println("Execution time : " + (end - start) + " milliseconds");
-        System.out.println();
+        printTime(end - start);
     }
 
     private void handleSearchScore(SearchScoreCommand command) throws Exception {
@@ -114,8 +129,7 @@ public class CLIClient {
         ).get();
         long end = System.currentTimeMillis();
         printInTable(scores);
-        System.out.println("Execution time : " + (end - start) + " milliseconds");
-        System.out.println();
+        printTime(end - start);
     }
 
     private void handleSubmitScore(SubmitScoreCommand command) throws Exception {
@@ -130,25 +144,33 @@ public class CLIClient {
         ).get();
         long end = System.currentTimeMillis();
         printInTable(List.of(score));
-        System.out.println("Execution time : " + (end - start) + " milliseconds");
-        System.out.println();
+        printTime(end - start);
     }
 
     private void handleLoadTest(LoadTestCommand command) {
         try {
-            LoadTestScenario.builder()
+            long start = System.currentTimeMillis();
+            LoadTestMetrics metrics = LoadTestScenario.builder()
                     .numberOfUsers(command.getNumberOfUsers())
                     .numberOfApplications(command.getNumberOfApplications())
                     .numberOfThreads(command.getNumberOfThreads())
                     .requestPerThread(command.getRequestPerThread())
                     .build()
-                    .run(command.getUpdatePeriod(), TimeUnit.SECONDS, (metrics) -> {
-                        System.out.println(metrics.getSuccessRequestCounter().getCount());
-                    });
+                    .run(command.getUpdatePeriod(), TimeUnit.SECONDS, CLIClient::printInTable);
+            long end = System.currentTimeMillis();
+            final long totalCalls = metrics.getSuccessRequestCounter().getCount() + metrics.getExceptionRequestCounter().getCount();
+            System.out.println("Total Calls   : " + totalCalls);
+            System.out.println("Success Calls : " + metrics.getSuccessRequestCounter().getCount());
+            System.out.println("Error Calls   : " + metrics.getExceptionRequestCounter().getCount());
+            printTime(end - start);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+
+    private static void printTime(long duration) {
+        System.out.println("Execution time : " + duration + " milliseconds\r\n");
     }
 
     private static void printInTable(List<RankedScore> scores) {
@@ -160,7 +182,30 @@ public class CLIClient {
             data[i][2] = score.getScore();
         }
         TextTable textTable = new TextTable(new String[]{"  Rank  ", "  User  ", "  Score  "}, data);
-        textTable.printTable(System.out, 5);
+        textTable.printTable(System.out, 3);
+        System.out.println();
+    }
+
+    private static Object[] toTableValues(String name, Timer timer) {
+        return new Object[]{
+                name,
+                timer.getCount(),
+                FMT.format(timer.getSnapshot().getMean()),
+                timer.getSnapshot().getMax(),
+                timer.getSnapshot().getMin(),
+                FMT.format(timer.getMeanRate()),
+                FMT.format(timer.getOneMinuteRate()),
+                FMT.format(timer.getFiveMinuteRate())
+        };
+    }
+
+    private static void printInTable(LoadTestMetrics metrics) {
+        Object[][] data = new Object[3][];
+        data[0] = toTableValues("Submit", metrics.getSubmitTimer());
+        data[1] = toTableValues("Search", metrics.getSearchTimer());
+        data[2] = toTableValues("GetTopScoreList", metrics.getGetListTimer());
+        TextTable textTable = new TextTable(LOAD_TEST_TABLE_HEADERS, data);
+        textTable.printTable(System.out, 3);
         System.out.println();
     }
 

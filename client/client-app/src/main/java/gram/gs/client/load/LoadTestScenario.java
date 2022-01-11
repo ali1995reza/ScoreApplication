@@ -102,7 +102,7 @@ public class LoadTestScenario {
         this.metrics = new MetricRegistry();
     }
 
-    public void run(long updatePeriod, TimeUnit unit, Consumer<LoadTestMetrics> listener) {
+    public LoadTestMetrics run(long updatePeriod, TimeUnit unit, Consumer<LoadTestMetrics> listener) {
         final CloseableHttpAsyncClient httpClient = HttpAsyncClients.custom()
                 .setDefaultIOReactorConfig(
                         IOReactorConfig.custom()
@@ -133,8 +133,8 @@ public class LoadTestScenario {
 
         while (remainingThreads.getCount() > 0) {
             try {
-                wait(updatePeriod, unit);
                 listener.accept(testMetrics);
+                wait(updatePeriod, unit);
             } catch (Exception e) {
                 try {
                     httpClient.close();
@@ -151,6 +151,7 @@ public class LoadTestScenario {
         } catch (IOException ex) {
         }
         executor.shutdownNow();
+        return testMetrics;
     }
 
     private static void wait(long time, TimeUnit unit) throws InterruptedException {
