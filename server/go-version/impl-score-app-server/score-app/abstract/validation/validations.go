@@ -3,8 +3,8 @@ package validation
 import "regexp"
 
 const (
-	USER_ID_PATTERN        = "^([0-9a-zA-Z_\\-]){3,}$"
-	APPLICATION_ID_PATTERN = "^([0-9a-zA-Z_\\-]){3,}$"
+	UserIdPattern        = "^([0-9a-zA-Z_\\-]){3,}$"
+	ApplicationIdPattern = "^([0-9a-zA-Z_\\-]){3,}$"
 )
 
 type Validator struct {
@@ -13,8 +13,8 @@ type Validator struct {
 }
 
 func NewValidator() *Validator {
-	userIdRegx, _ := regexp.Compile(USER_ID_PATTERN)
-	applicationIdRegx, _ := regexp.Compile(APPLICATION_ID_PATTERN)
+	userIdRegx, _ := regexp.Compile(UserIdPattern)
+	applicationIdRegx, _ := regexp.Compile(ApplicationIdPattern)
 	return &Validator{userIdRegx: userIdRegx, applicationIdRegx: applicationIdRegx}
 }
 
