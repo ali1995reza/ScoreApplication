@@ -10,13 +10,12 @@ import (
 )
 
 type ScoreApplicationServer struct {
-	host        string
-	port        uint16
+	address     string
 	application *score_app.ScoreApplication
 }
 
-func NewScoreApplicationServer(host string, port uint16, application *score_app.ScoreApplication) *ScoreApplicationServer {
-	return &ScoreApplicationServer{host: host, port: port, application: application}
+func NewScoreApplicationServer(address string, application *score_app.ScoreApplication) *ScoreApplicationServer {
+	return &ScoreApplicationServer{address: address, application: application}
 }
 
 func (server *ScoreApplicationServer) Run() {
@@ -88,8 +87,7 @@ func (server *ScoreApplicationServer) Run() {
 		}
 		context.JSON(http.StatusOK, result)
 	})
-	router.Run()
-	err := router.Run(server.host + ":" + string(server.port))
+	err := router.Run(server.address)
 	print(err.Error())
 }
 
