@@ -30,9 +30,9 @@ public class SqlScoreRepository extends SqlScoreRepositoryAbstract {
     private final String getListSQL = "SELECT * FROM " + tableName + " WHERE application_id=? ORDER BY score DESC, user_id DESC LIMIT ? OFFSET ?";
     private final String getSQL = "SELECT * FROM " + tableName + " WHERE application_id=? AND user_id=?";
     private final String calculateRankSQL = "SELECT 1+COUNT(*) FROM " + tableName + " WHERE application_id=? AND (score>?  OR (score=? AND user_id>?))";
-    private final String getTopAndBottomSQL = "(SELECT p.application_id, p.user_id, p.score FROM " + tableName + " AS n JOIN " + tableName + " AS p ON (p.application_id=n.application_id AND (p.score>n.score OR (p.score=n.score AND p.user_id>=n.user_id))) WHERE n.application_id=? AND n.user_id=? ORDER BY p.score ASC, p.user_id ASC LIMIT ?) " +
+    private final String getTopAndBottomSQL = "(SELECT p.id, p.application_id, p.user_id, p.score FROM " + tableName + " AS n JOIN " + tableName + " AS p ON (p.application_id=n.application_id AND (p.score>n.score OR (p.score=n.score AND p.user_id>=n.user_id))) WHERE n.application_id=? AND n.user_id=? ORDER BY p.score ASC, p.user_id ASC LIMIT ?) " +
             "UNION " +
-            "(SELECT p.application_id, p.user_id, p.score FROM " + tableName + " AS n JOIN " + tableName + " AS p ON (p.application_id=n.application_id AND (p.score<n.score OR (p.score=n.score AND p.user_id<n.user_id))) WHERE n.application_id=? AND n.user_id=? ORDER BY p.score DESC, p.user_id DESC LIMIT ?)";
+            "(SELECT p.id, p.application_id, p.user_id, p.score FROM " + tableName + " AS n JOIN " + tableName + " AS p ON (p.application_id=n.application_id AND (p.score<n.score OR (p.score=n.score AND p.user_id<n.user_id))) WHERE n.application_id=? AND n.user_id=? ORDER BY p.score DESC, p.user_id DESC LIMIT ?)";
 
 
     public SqlScoreRepository(DataSource dataSource) {
