@@ -1,3 +1,3 @@
 @echo off
 go build .\main\run-server.go
-.\run-server
+if %ERRORLEVEL% EQU 0 run-server.exe
