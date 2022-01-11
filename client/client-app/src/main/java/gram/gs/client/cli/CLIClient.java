@@ -110,7 +110,7 @@ public class CLIClient {
                 command.getUserId(),
                 command.getApplicationId(),
                 command.getTop(),
-                command.getTop()
+                command.getBottom()
         ).get();
         long end = System.currentTimeMillis();
         printInTable(scores);

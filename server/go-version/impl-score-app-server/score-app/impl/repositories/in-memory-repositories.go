@@ -113,7 +113,7 @@ func (repo *InMemoryScoreRepository) Search(userId string, applicationId string,
 	scoresList.Lock.Lock()
 	index := scoresList.binarySearch(scoreHolder)
 	offset := max(index-top, 0)
-	size := max(index-offset+bottom, int32(len(scoresList.Scores)))
+	size := min(index+bottom-offset+1, int32(len(scoresList.Scores)))
 	len := scoresList.possibleSize(int64(offset), int64(size))
 	result := make([]*models.RankedScore, len)
 	for i := int32(0); i < len; i++ {
@@ -202,6 +202,13 @@ func (list *_SortScoreList) possibleSize(offset int64, size int64) int32 {
 
 func max(a int32, b int32) int32 {
 	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a int32, b int32) int32 {
+	if a < b {
 		return a
 	}
 	return b

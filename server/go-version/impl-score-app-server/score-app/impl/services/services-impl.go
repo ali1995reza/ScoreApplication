@@ -42,32 +42,25 @@ func (j JwtAuthenticationService) ValidateToken(tokenString string) (*string, ex
 		return j.secret, nil
 	})
 	if err != nil || !token.Valid {
-		print("1")
 		return nil, exceptions.NewAuthenticationTokenInvalidException("invalid token")
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		print("2")
 		return nil, exceptions.NewAuthenticationTokenInvalidException("invalid token")
 	}
 	userId, ok := claims[USER_ID].(string)
 	if !ok {
-		print("3")
 		return nil, exceptions.NewAuthenticationTokenInvalidException("invalid token")
 	}
 	issuer, ok := claims[ISSUER].(string)
 	if !ok || issuer != "GramGames" {
-		print("4")
 		return nil, exceptions.NewAuthenticationTokenInvalidException("invalid token")
 	}
 	expirationTime := claims[EXPIRATION_TIME].(float64)
-	print(expirationTime)
 	if !ok {
-		print("5")
 		return nil, exceptions.NewAuthenticationTokenInvalidException("invalid token")
 	}
 	if time.Now().UnixMilli() > int64(expirationTime) {
-		print("6")
 		return nil, exceptions.NewAuthenticationTokenExpiredException("token expired")
 	}
 	return &userId, nil
