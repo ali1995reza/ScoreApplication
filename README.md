@@ -67,7 +67,7 @@ Client can login to application by requesting to this api.
 
 | Url                                                     | Http Method     | Request Body   |Response Body |
 | :------------------------------------------------------ | :-------------- | :------------- | :------------|
-|`http://[host:port]/applications/{applicationId}/scores` |`PUT`            |`SubmitRequest` | `RankedScore`
+|`http://[host:port]/applications/{applicationId}/scores` |`POST`            |`SubmitRequest` | `RankedScore`
 
 ##### Path Parameters
 
