@@ -34,7 +34,7 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
             });
         });
         javalin.addHandler(HandlerType.GET, Urls.LOGIN, this::login);
-        javalin.addHandler(HandlerType.PUT, Urls.SUBMIT_SCORE, this::submitScore);
+        javalin.addHandler(HandlerType.POST, Urls.SUBMIT_SCORE, this::submitScore);
         javalin.addHandler(HandlerType.GET, Urls.GET_TOP_SCORES_LIST, this::getTopScoreList);
         javalin.addHandler(HandlerType.GET, Urls.SEARCH_SCORES_LIST, this::searchScoreList);
         javalin.exception(Exception.class, this::handleException);

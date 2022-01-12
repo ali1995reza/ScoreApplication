@@ -8,6 +8,7 @@ import gram.gs.client.abs.dto.ClientToken;
 import gram.gs.client.abs.dto.RankedScore;
 import gram.gs.client.assertion.Assert;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
@@ -132,14 +133,14 @@ public class HttpScoreApplicationClient implements ScoreApplicationClient {
                 .setPort(port)
                 .setPath("applications/" + applicationId + "/scores")
                 .build();
-        HttpPut put = new HttpPut(uri);
-        put.addHeader("X-CLIENT-TOKEN", token);
+        HttpPost post = new HttpPost(uri);
+        post.addHeader("X-CLIENT-TOKEN", token);
         try {
-            put.setEntity(new ByteArrayEntity(MAPPER.writeValueAsBytes(new SubmitScoreRequestBody(score))));
+            post.setEntity(new ByteArrayEntity(MAPPER.writeValueAsBytes(new SubmitScoreRequestBody(score))));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
         }
-        return put;
+        return post;
     }
 
     private HttpUriRequest getTopScoreRequest(String applicationId, long offset, long size) throws URISyntaxException {

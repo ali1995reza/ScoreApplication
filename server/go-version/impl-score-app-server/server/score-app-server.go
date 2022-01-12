@@ -49,7 +49,7 @@ func (server *ScoreApplicationServer) Run() {
 		}
 		context.JSON(http.StatusOK, result)
 	})
-	router.PUT(UrlSubmitScore, func(context *gin.Context) {
+	router.POST(UrlSubmitScore, func(context *gin.Context) {
 		applicationId := context.Param(PathParamApplicationId)
 		token := context.GetHeader(HeaderClientToken)
 		var request SubmitScoreRequest
