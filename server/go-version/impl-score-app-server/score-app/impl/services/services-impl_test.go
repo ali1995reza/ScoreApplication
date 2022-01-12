@@ -30,7 +30,7 @@ func TestTokenExpiredException(test *testing.T) {
 	tokeString := service.CreateToken("user", 1)
 	time.Sleep(time.Millisecond * 2)
 	if _, ex := service.ValidateToken(*tokeString); ex == nil {
-		print("expect got exception but got nothing")
+		test.Errorf("expect got exception but got nothing")
 	}
 }
 
@@ -38,6 +38,6 @@ func TestInvalidTokenException(test *testing.T) {
 	service := NewJwtAuthenticationService("secret")
 	time.Sleep(time.Millisecond * 2)
 	if _, ex := service.ValidateToken("invalid-token"); ex == nil {
-		print("expect got exception but got nothing")
+		test.Errorf("expect got exception but got nothing")
 	}
 }
