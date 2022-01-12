@@ -46,7 +46,7 @@ Client can login to application by requesting to this api.
 
 | Url                                 | Http Method    | Request Body |Response Body |
 | :--------------------------------- | :-------------- | :------------| :------------|
-|`http://[host:port]/login/{userId}` |`GET`            |`-`           | `ClientToken`|
+|`http://[host:port]/login/{userId}` |`GET`            |`-`           | `ClientToken`
 
 ##### Path Parameters
 
@@ -58,8 +58,8 @@ Client can login to application by requesting to this api.
 
 | Status               | Description     |
 | :------------------- | :-------------- |
-|`200`                 | ok              |
-|`400`                 | `userId` format is not valid|
+|`200`                 | ok
+|`400`                 | `userId` format is not valid
 
 <br/>
 
@@ -67,7 +67,7 @@ Client can login to application by requesting to this api.
 
 | Url                                                     | Http Method     | Request Body   |Response Body |
 | :------------------------------------------------------ | :-------------- | :------------- | :------------|
-|`http://[host:port]/applications/{applicationId}/scores` |`PUT`            |`SubmitRequest` | `RankedScore`|
+|`http://[host:port]/applications/{applicationId}/scores` |`PUT`            |`SubmitRequest` | `RankedScore`
 
 ##### Path Parameters
 
@@ -85,9 +85,9 @@ Client can login to application by requesting to this api.
 
 | Status               | Description     |
 | :------------------- | :-------------- |
-|`200`                 | ok              |
-|`400`                 | if `applicationId` format is not valid<br/>if `score` value is negative|
-|`401`                 | `authentication token` expired or invalid|
+|`200`                 | ok
+|`400`                 | if `applicationId` format is not valid<br/>if `score` value is negative
+|`401`                 | `authentication token` expired or invalid
 
 <br/>
 
@@ -95,7 +95,7 @@ Client can login to application by requesting to this api.
 
 | Url                                                     | Http Method     | Request Body |Response Body       |
 | :------------------------------------------------------ | :-------------- | :------------| :----------------- |
-|`http://[host:port]/applications/{applicationId}/scores` |`GET`            |`-`           | `List[RankedScore]`|
+|`http://[host:port]/applications/{applicationId}/scores` |`GET`            |`-`           | `List[RankedScore]`
 
 ##### Path Parameters
 
@@ -114,7 +114,7 @@ Client can login to application by requesting to this api.
 
 | Status               | Description     |
 | :------------------- | :-------------- |
-|`200`                 | ok              |
+|`200`                 | ok
 |`400`                 | if `applicationId` format is not valid<br/>if `size` or `offset` value is invalid
 
 <br/>
@@ -123,7 +123,7 @@ Client can login to application by requesting to this api.
 
 | Url                                                            | Http Method     | Request Body |Response Body       |
 | :------------------------------------------------------------- | :-------------- | :------------| :----------------- |
-|`http://[host:port]/applications/{applicationId}/scores/search` |`GET`            |`-`           | `List[RankedScore]`|
+|`http://[host:port]/applications/{applicationId}/scores/search` |`GET`            |`-`           | `List[RankedScore]`
 
 ##### Path Parameters
 
@@ -143,7 +143,7 @@ Client can login to application by requesting to this api.
 
 | Status               | Description     |
 | :------------------- | :-------------- |
-|`200`                 | ok              |
+|`200`                 | ok
 |`400`                 | if `applicationId` format is not valid<br/>if `top` or `bottom` is negative
 |`404`                 | if there is not any score submitted for the user in the application
 
@@ -210,5 +210,18 @@ This client will provide a command line interface to communicate with server.
 - Present `Java` directory in `system path`
 - Installed `maven` version `3.x.y`
 - Internet connection
+
+##### Commands
+| Name               | Description     |
+| :------------------| :-------------- |
+|`help`              | print help           
+|`login`             | login           
+|`logout`            | logout          
+|`submit`            | submit score for a specific application 
+|`get`               | get top score list for a specific application
+|`search`            | search score of a specific user in a specific application
+|`load`              | to start a new load test on the server and will sends simulated requests to server
+|`exit`              | exit
+
 
 ***Note*** : Client will ask user to config it (serve-host, server-port) on startup.
