@@ -20,4 +20,19 @@ public class UtilTest {
         Assert.isFalse(Utils.isValidUserId("john#223"), TestAssertionException::new);
         Assert.isFalse(Utils.isValidUserId("john.123"), TestAssertionException::new);
     }
+
+
+    @Test
+    public void testApplicationIdValidation() {
+        Assert.isTrue(Utils.isValidApplicationId("123"), TestAssertionException::new);
+        Assert.isTrue(Utils.isValidApplicationId("app1"), TestAssertionException::new);
+        Assert.isTrue(Utils.isValidApplicationId("app-123"), TestAssertionException::new);
+        Assert.isTrue(Utils.isValidApplicationId("app_123"), TestAssertionException::new);
+
+        Assert.isFalse(Utils.isValidApplicationId("%app_12"), TestAssertionException::new);
+        Assert.isFalse(Utils.isValidApplicationId("app 223"), TestAssertionException::new);
+        Assert.isFalse(Utils.isValidApplicationId("app#223"), TestAssertionException::new);
+        Assert.isFalse(Utils.isValidApplicationId("app.123"), TestAssertionException::new);
+    }
+
 }
