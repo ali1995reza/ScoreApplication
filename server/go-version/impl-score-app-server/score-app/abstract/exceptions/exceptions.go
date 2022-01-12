@@ -8,6 +8,7 @@ const (
 	InvalidParametersExceptionId          = "INVALID_PARAMETERS"
 	ScoreNotFoundExceptionId              = "SCORE_NOT_FOUND"
 	UserAlreadyExistsExceptionId          = "USER_ALREADY_EXISTS"
+	UnknownExceptionId                    = "UNKNOWN"
 )
 
 type ScoreApplicationException interface {
@@ -147,3 +148,18 @@ func (u *UserAlreadyExistsException) GetMessage() string {
 }
 
 //------------------------------------------------------------------------------------
+type UnknownException struct {
+	message string
+}
+
+func NewUnknownException(message string) *UnknownException {
+	return &UnknownException{message: message}
+}
+
+func (u *UnknownException) GetId() string {
+	return UnknownExceptionId
+}
+
+func (u *UnknownException) GetMessage() string {
+	return u.message
+}
