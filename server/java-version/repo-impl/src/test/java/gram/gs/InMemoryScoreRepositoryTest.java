@@ -69,4 +69,27 @@ public class InMemoryScoreRepositoryTest {
         }
     }
 
+    @Test
+    public void testSearchScoreList() {
+        for (int i = 0; i < 1000; i++) {
+            RankedScore score = scoreRepository.save(TestUtils.getId(i), "app", i + 1);
+            assertEquals(1, score.getRank());
+        }
+
+        List<RankedScore> scores = scoreRepository.get("999", "app", 1000, 1);
+        assertEquals(2, scores.size());
+        assertEquals("999", scores.get(0).getUserId());
+        assertEquals(1 , scores.get(0).getRank());
+        assertEquals("998", scores.get(1).getUserId());
+        assertEquals(2 , scores.get(1).getRank());
+        scores = scoreRepository.get("0", "app", 1, 1000);
+        assertEquals(2, scores.size());
+        assertEquals("1", scores.get(0).getUserId());
+        assertEquals(999 , scores.get(0).getRank());
+        assertEquals("0", scores.get(1).getUserId());
+        assertEquals(1000 , scores.get(1).getRank());
+        scores = scoreRepository.get("200", "app", 1, 1);
+        assertEquals(3, scores.size());
+    }
+
 }
