@@ -11,60 +11,41 @@ import static gram.gs.TestUtils.newId;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class InMemoryUserRepositoryTest {
+public class InMemoryUserRepositoryTest implements UserRepositoryTest {
 
-
-    private final InMemoryUserRepository userRepository;
+    private final UserRepositoryTester tester;
 
     public InMemoryUserRepositoryTest() {
-        userRepository = new InMemoryUserRepository();
-    }
-
-    private void clear() {
-        userRepository.clear();
+        tester = new UserRepositoryTester(new InMemoryUserRepository());
     }
 
     @Test
+    @Override
     public void testAdd() throws Exception {
-        clear();
-        String id = newId();
-        User user = userRepository.add(id);
-        assertEquals(id, user.getId());
+        tester.testAdd();
     }
 
     @Test
+    @Override
     public void testGet() throws Exception {
-        clear();
-        String id = newId();
-        userRepository.add(id);
-        User user = userRepository.get(id);
-        assertEquals(id, user.getId());
+        tester.testGet();
     }
 
     @Test
+    @Override
     public void testGetOrAdd() throws Exception {
-        clear();
-        String id = newId();
-        User user = userRepository.addOrGet(id);
-        assertEquals(id, user.getId());
-        user = userRepository.addOrGet(id);
-        assertEquals(id, user.getId());
+        tester.testGetOrAdd();
     }
 
     @Test
+    @Override
     public void testDoesntExistUser() throws Exception {
-        clear();
-        User user = userRepository.get(newId());
-        assertNull(user);
+        tester.testDoesntExistUser();
     }
 
     @Test
+    @Override
     public void testUserAlreadyException() throws Exception {
-        clear();
-        assertThrows(UserAlreadyExistsException.class, () -> {
-            String id = newId();
-            userRepository.add(id);
-            userRepository.add(id);
-        });
+        tester.testUserAlreadyException();
     }
 }

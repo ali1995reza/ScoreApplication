@@ -2,77 +2,50 @@ package gram.gs;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import gram.gs.exceptions.UserAlreadyExistsException;
-import gram.gs.model.User;
-import gram.gs.repository.impl.memory.InMemoryUserRepository;
 import gram.gs.repository.impl.sql.SqlUserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import static gram.gs.TestUtils.newId;
-import static org.junit.jupiter.api.Assertions.*;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SqlUserRepositoryTest {
+public class SqlUserRepositoryTest implements UserRepositoryTest {
 
-
-    private final SqlUserRepository userRepository;
+    private final UserRepositoryTester tester;
 
     public SqlUserRepositoryTest() {
         HikariConfig config = new HikariConfig();
         config.setMaximumPoolSize(1);
         config.setJdbcUrl("jdbc:h2:mem:test");
         HikariDataSource dataSource = new HikariDataSource(config);
-        userRepository = new SqlUserRepository(dataSource);
-    }
-
-
-    private void clear() {
-        userRepository.clear();
+        tester = new UserRepositoryTester(new SqlUserRepository(dataSource));
     }
 
     @Test
+    @Override
     public void testAdd() throws Exception {
-        clear();
-        String id = newId();
-        User user = userRepository.add(id);
-        assertEquals(id, user.getId());
+        tester.testAdd();
     }
 
     @Test
+    @Override
     public void testGet() throws Exception {
-        clear();
-        String id = newId();
-        userRepository.add(id);
-        User user = userRepository.get(id);
-        assertEquals(id, user.getId());
+        tester.testGet();
     }
 
     @Test
+    @Override
     public void testGetOrAdd() throws Exception {
-        clear();
-        String id = newId();
-        User user = userRepository.addOrGet(id);
-        assertEquals(id, user.getId());
-        user = userRepository.addOrGet(id);
-        assertEquals(id, user.getId());
+        tester.testGetOrAdd();
     }
 
     @Test
+    @Override
     public void testDoesntExistUser() throws Exception {
-        clear();
-        User user = userRepository.get(newId());
-        assertNull(user);
+        tester.testDoesntExistUser();
     }
 
     @Test
+    @Override
     public void testUserAlreadyException() throws Exception {
-        clear();
-        assertThrows(UserAlreadyExistsException.class, () -> {
-            String id = newId();
-            userRepository.add(id);
-            userRepository.add(id);
-        });
+        tester.testUserAlreadyException();
     }
 }
