@@ -1,15 +1,17 @@
 package gram.gs.client.load;
 
 import gram.gs.client.abs.ScoreApplicationClient;
+import gram.gs.client.abs.dto.ClientToken;
 import gram.gs.client.abs.dto.RankedScore;
 
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 final class LoadContext {
 
-    private final ConcurrentHashMap<Integer, String> tokens;
+    private final ConcurrentHashMap<Integer, TokenHolder> tokens;
     private final int numberOfUsers;
     private final int numberOfApps;
     private final Random random = new Random();
@@ -33,7 +35,7 @@ final class LoadContext {
 
     public SearchDetails getRandomSearchDetails() {
         synchronized (scoresHolder) {
-            if(scoresHolder.size() == 0) {
+            if (scoresHolder.size() == 0) {
                 return null;
             }
             return scoresHolder.get(random.nextInt(scoresHolder.size()));
@@ -45,13 +47,16 @@ final class LoadContext {
     }
 
     private String getTokenFor(int userIndex, ScoreApplicationClient client) {
-        return tokens.computeIfAbsent(userIndex, (index) -> {
+        return tokens.compute(userIndex, (index, last) -> {
+            if (System.currentTimeMillis() - last.getCreatedTime() < TimeUnit.MINUTES.toMillis(9)) {
+                return last;
+            }
             try {
-                return client.login("USER-" + index).get().getToken();
+                return TokenHolder.from(client.login("USER-" + index).get());
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
-        });
+        }).getToken();
     }
 
     public void submit(RankedScore score) {
@@ -60,6 +65,29 @@ final class LoadContext {
                 scoresHolder.removeFirst();
             }
             scoresHolder.addLast(new SearchDetails(score.getUserId(), score.getApplicationId()));
+        }
+    }
+
+    private final static class TokenHolder {
+
+        private final String token;
+        private final long createdTime;
+
+        private TokenHolder(String token, long createdTime) {
+            this.token = token;
+            this.createdTime = createdTime;
+        }
+
+        private static TokenHolder from(ClientToken token) {
+            return new TokenHolder(token.getToken(), System.currentTimeMillis());
+        }
+
+        public long getCreatedTime() {
+            return createdTime;
+        }
+
+        public String getToken() {
+            return token;
         }
     }
 }
