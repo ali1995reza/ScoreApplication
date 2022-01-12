@@ -31,7 +31,13 @@ public class CLIClient {
             " 1 Min Rate [call/sec]",
             " 5 Min Rate [call/sec]"
     };
+    private final static String[] RANK_SCORE_TABLE_HEADERS = new String[]{
+            "  Rank  ",
+            "  User  ",
+            "  Score  "
+    };
     private final static DecimalFormat FMT = new DecimalFormat("0.00");
+
 
     private final CommandParser commandParser;
     private final ScoreApplicationClient client;
@@ -72,7 +78,7 @@ public class CLIClient {
                     return exitCommand.getCode();
                 }
             } catch (Exception e) {
-                System.out.println("ERROR : " + e.getMessage()+"\r\n");
+                System.out.println("ERROR : " + e.getMessage() + "\r\n");
             }
         }
     }
@@ -172,15 +178,16 @@ public class CLIClient {
         System.out.println("Execution time : " + duration + " milliseconds\r\n");
     }
 
+    private static Object[] toTableValues(RankedScore score) {
+        return new Object[]{score.getRank(), score.getUserId(), score.getScore()};
+    }
+
     private static void printInTable(List<RankedScore> scores) {
-        Object[][] data = new Object[scores.size()][3];
+        Object[][] data = new Object[scores.size()][];
         for (int i = 0; i < scores.size(); i++) {
-            RankedScore score = scores.get(i);
-            data[i][0] = score.getRank();
-            data[i][1] = score.getUserId();
-            data[i][2] = score.getScore();
+            data[i] = toTableValues(scores.get(i));
         }
-        TextTable textTable = new TextTable(new String[]{"  Rank  ", "  User  ", "  Score  "}, data);
+        TextTable textTable = new TextTable(RANK_SCORE_TABLE_HEADERS, data);
         textTable.printTable(System.out, 3);
         System.out.println();
     }
