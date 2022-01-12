@@ -26,7 +26,7 @@ func (app *ScoreApplication) Login(userId string) (*string, exceptions.ScoreAppl
 		return nil, exceptions.NewInvalidUserIdFormatException("user id format invalid")
 	}
 	app.userRepository.AddOrGet(userId)
-	return app.authenticationService.CreateToken(userId, 10*10*1000), nil
+	return app.authenticationService.CreateToken(userId, 10*60*1000), nil
 }
 
 func (app *ScoreApplication) SubmitScore(token string, applicationId string, score int64) (*models.RankedScore, exceptions.ScoreApplicationException) {
