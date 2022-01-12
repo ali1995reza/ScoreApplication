@@ -70,7 +70,8 @@ public class CLIClient {
     public synchronized int run(Supplier<String> commandSupplier) {
         System.out.println("\r\n\r\n This is a simple http CLI client for score server.");
         System.out.println(" For getting help just please type \"help\" and press enter !");
-        System.out.println(" Good Luck !\r\n\r\n");
+        System.out.println(" Version 0.1.0");
+        System.out.println(" Good Luck !\r\n");
         while (true) {
             printCommandInterceptor();
             String command = commandSupplier.get();
