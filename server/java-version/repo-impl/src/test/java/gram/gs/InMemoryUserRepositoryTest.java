@@ -20,13 +20,13 @@ public class InMemoryUserRepositoryTest {
         userRepository = new InMemoryUserRepository();
     }
 
-    @BeforeEach
-    private void clearRepository() {
+    private void clear() {
         userRepository.clear();
     }
 
     @Test
     public void testAdd() throws Exception {
+        clear();
         String id = newId();
         User user = userRepository.add(id);
         assertEquals(id, user.getId());
@@ -34,6 +34,7 @@ public class InMemoryUserRepositoryTest {
 
     @Test
     public void testGet() throws Exception {
+        clear();
         String id = newId();
         userRepository.add(id);
         User user = userRepository.get(id);
@@ -42,6 +43,7 @@ public class InMemoryUserRepositoryTest {
 
     @Test
     public void testGetOrAdd() throws Exception {
+        clear();
         String id = newId();
         User user = userRepository.addOrGet(id);
         assertEquals(id, user.getId());
@@ -51,12 +53,14 @@ public class InMemoryUserRepositoryTest {
 
     @Test
     public void testDoesntExistUser() throws Exception {
+        clear();
         User user = userRepository.get(newId());
         assertNull(user);
     }
 
     @Test
     public void testUserAlreadyException() throws Exception {
+        clear();
         assertThrows(UserAlreadyExistsException.class, () -> {
             String id = newId();
             userRepository.add(id);

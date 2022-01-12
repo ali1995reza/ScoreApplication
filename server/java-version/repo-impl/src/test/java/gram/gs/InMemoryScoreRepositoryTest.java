@@ -22,7 +22,7 @@ public class InMemoryScoreRepositoryTest {
         scoreRepository = new InMemoryScoreRepository();
     }
 
-    @BeforeEach
+
     private void clear() {
         scoreRepository.clear();
     }
@@ -30,6 +30,7 @@ public class InMemoryScoreRepositoryTest {
 
     @Test
     public void testSubmitScore() {
+        clear();
         for (int i = 0; i < 1000; i++) {
             scoreRepository.save(TestUtils.newId(), TestUtils.newId(), random.nextInt(100));
         }
@@ -37,6 +38,7 @@ public class InMemoryScoreRepositoryTest {
 
     @Test
     public void testSubmitScoreTwice() {
+        clear();
         final String userId = TestUtils.getId("user");
         final String appId = TestUtils.getId("app");
 
@@ -53,6 +55,7 @@ public class InMemoryScoreRepositoryTest {
 
     @Test
     public void testGetList() {
+        clear();
         for (int i = 0; i < 1000; i++) {
             RankedScore score = scoreRepository.save(TestUtils.getId(i), TestUtils.getId(i / 100), (i % 100) + 1);
             assertEquals(1, score.getRank());
@@ -71,6 +74,7 @@ public class InMemoryScoreRepositoryTest {
 
     @Test
     public void testSearchScoreList() {
+        clear();
         for (int i = 0; i < 1000; i++) {
             RankedScore score = scoreRepository.save(TestUtils.getId(i), "app", i + 1);
             assertEquals(1, score.getRank());
