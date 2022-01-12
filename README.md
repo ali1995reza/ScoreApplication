@@ -63,7 +63,7 @@ Client can login to application by requesting to this api.
 
 <br/>
 
-## - Submit Score
+### - Submit Score
 
 | Url                                                     | Http Method     | Request Body   |Response Body |
 | :------------------------------------------------------ | :-------------- | :------------- | :------------|
@@ -91,7 +91,7 @@ Client can login to application by requesting to this api.
 
 <br/>
 
-## - Get Top Scores
+### - Get Top Scores
 
 | Url                                                     | Http Method     | Request Body |Response Body       |
 | :------------------------------------------------------ | :-------------- | :------------| :----------------- |
