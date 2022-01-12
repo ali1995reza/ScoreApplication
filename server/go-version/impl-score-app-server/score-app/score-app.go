@@ -36,6 +36,9 @@ func (app *ScoreApplication) SubmitScore(token string, applicationId string, sco
 	if user == nil {
 		return nil, exceptions.NewAuthenticationTokenInvalidException("user not found")
 	}
+	if score < 0 {
+		return nil, exceptions.NewInvalidParametersException("[score] cant not be negative")
+	}
 	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
