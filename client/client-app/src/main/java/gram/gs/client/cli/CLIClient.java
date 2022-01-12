@@ -24,9 +24,9 @@ public class CLIClient {
     private final static String[] LOAD_TEST_TABLE_HEADERS = new String[]{
             " Method ",
             " Total Calls ",
-            " Mean Time [ms]",
-            " Maximum Time [ms]",
-            " Minimum Time [ms]",
+            " Mean Time [ns]",
+            " Maximum Time [ns]",
+            " Minimum Time [ns]",
             " Mean Rate [call/sec]",
             " 1 Min Rate [call/sec]",
             " 5 Min Rate [call/sec]"

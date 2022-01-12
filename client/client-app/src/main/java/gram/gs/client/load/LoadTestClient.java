@@ -3,6 +3,7 @@ package gram.gs.client.load;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import gram.gs.client.abs.ScoreApplicationClient;
+import gram.gs.client.abs.dto.RankedScore;
 import gram.gs.client.impl.ScoreServerError;
 
 import java.util.Random;
@@ -195,14 +196,10 @@ final class LoadTestClient implements Runnable {
                 case CALL_SUBMIT:
                     long score = lastScore + random.nextInt(4) + 1;
                     try (Timer.Context time = submitTimer.time()) {
-                        lastScore = client.submitScore(context.getRandomToken(client), context.getRandomApplicationId(), score).get().getScore();
+                        RankedScore rankedScore = client.submitScore(context.getRandomToken(client), context.getRandomApplicationId(), score).get();
+                        lastScore = rankedScore.getScore();
+                        context.submit(rankedScore);
                         successRequestCounter.inc();
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof ScoreServerError) {
-                            successRequestCounter.inc();
-                        } else {
-                            exceptionRequestCounter.inc();
-                        }
                     } catch (Exception e) {
                         exceptionRequestCounter.inc();
                         e.printStackTrace();
@@ -212,27 +209,20 @@ final class LoadTestClient implements Runnable {
                     try (Timer.Context time = getListTimer.time()) {
                         client.getTopScoreList(context.getRandomApplicationId(), random.nextInt(1000), 1 + random.nextInt(1000)).get();
                         successRequestCounter.inc();
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof ScoreServerError) {
-                            successRequestCounter.inc();
-                        } else {
-                            exceptionRequestCounter.inc();
-                        }
                     } catch (Exception e) {
                         exceptionRequestCounter.inc();
                         e.printStackTrace();
                     }
                     break;
                 case CALL_SEARCH:
-                    try (Timer.Context time = searchTimer.time()) {
-                        client.searchScoreList(context.getRandomUserId(), context.getRandomApplicationId(), random.nextInt(1000), random.nextInt(1000)).get();
+                    SearchDetails details = context.getRandomSearchDetails();
+                    if(details == null) {
                         successRequestCounter.inc();
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof ScoreServerError) {
-                            successRequestCounter.inc();
-                        } else {
-                            exceptionRequestCounter.inc();
-                        }
+                        continue;
+                    }
+                    try (Timer.Context time = searchTimer.time()) {
+                        client.searchScoreList(details.getUserId(), details.getApplicationId(), random.nextInt(1000), random.nextInt(1000)).get();
+                        successRequestCounter.inc();
                     } catch (Exception e) {
                         exceptionRequestCounter.inc();
                         e.printStackTrace();
