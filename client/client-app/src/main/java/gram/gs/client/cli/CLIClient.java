@@ -72,8 +72,7 @@ public class CLIClient {
                     return exitCommand.getCode();
                 }
             } catch (Exception e) {
-                System.out.println("ERROR : " + e.getMessage());
-                System.out.println();
+                System.out.println("ERROR : " + e.getMessage()+"\r\n");
             }
         }
     }
