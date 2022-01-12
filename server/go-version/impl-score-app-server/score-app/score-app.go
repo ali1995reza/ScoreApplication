@@ -1,6 +1,7 @@
 package score_app
 
 import (
+	"fmt"
 	"impl-score-app-server/score-app/abstract/exceptions"
 	"impl-score-app-server/score-app/abstract/models"
 	repository "impl-score-app-server/score-app/abstract/repositories"
@@ -20,6 +21,7 @@ func NewScoreApplication(authenticationService service.AuthenticationService, us
 }
 
 func (app *ScoreApplication) Login(userId string) (*string, exceptions.ScoreApplicationException) {
+	fmt.Printf("login user with id %s\n", userId)
 	if !app.validator.IsValidUserId(userId) {
 		return nil, exceptions.NewInvalidUserIdFormatException("user id format invalid")
 	}
@@ -42,10 +44,12 @@ func (app *ScoreApplication) SubmitScore(token string, applicationId string, sco
 	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
+	fmt.Printf("submit score %d for application %s by user %s\n", score, applicationId, *userId)
 	return app.scoreRepository.Save(*userId, applicationId, score), nil
 }
 
 func (app *ScoreApplication) GetTopScoreList(applicationId string, offset int64, size int64) ([]*models.RankedScore, exceptions.ScoreApplicationException) {
+	fmt.Printf("get top score list for application %s with offset %d and size %d\n", applicationId, offset, size)
 	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
@@ -59,6 +63,7 @@ func (app *ScoreApplication) GetTopScoreList(applicationId string, offset int64,
 }
 
 func (app *ScoreApplication) Search(userId string, applicationId string, top int32, bottom int32) ([]*models.RankedScore, exceptions.ScoreApplicationException) {
+	fmt.Printf("search score list of application %s to find score of user %s - params : top=%d, bottom=%d\n", applicationId, userId, top, bottom)
 	if !app.validator.IsValidUserId(userId) {
 		return nil, exceptions.NewInvalidUserIdFormatException("user id format invalid")
 	}
