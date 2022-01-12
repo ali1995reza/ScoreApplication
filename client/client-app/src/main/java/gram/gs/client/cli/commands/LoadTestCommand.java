@@ -6,9 +6,9 @@ import gram.gs.client.command.annoations.CommandOption;
 @Command("load")
 public class LoadTestCommand {
 
-    @CommandOption(longName = "nusers", shortName = "nu", description = "number of simulated users")
+    @CommandOption(longName = "nusers", shortName = "nu", description = "number of simulated users (USER-1, USER-2 ...)")
     private int numberOfUsers;
-    @CommandOption(longName = "napps", shortName = "na", description = "number of simulated apps")
+    @CommandOption(longName = "napps", shortName = "na", description = "number of simulated apps (APP-1, APP-2, ...)")
     private int numberOfApplications;
     @CommandOption(longName = "nthreads", shortName = "nt", description = "number of parallel threads that send requests to server")
     private int numberOfThreads;
