@@ -48,7 +48,7 @@ final class LoadContext {
 
     private String getTokenFor(int userIndex, ScoreApplicationClient client) {
         return tokens.compute(userIndex, (index, last) -> {
-            if (System.currentTimeMillis() - last.getCreatedTime() < TimeUnit.MINUTES.toMillis(9)) {
+            if (last != null && System.currentTimeMillis() - last.getCreatedTime() < TimeUnit.MINUTES.toMillis(9)) {
                 return last;
             }
             try {
