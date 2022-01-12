@@ -7,29 +7,29 @@ import (
 
 func TestCreateToken(test *testing.T) {
 	service := NewJwtAuthenticationService("secret")
-	if tokeString := service.CreateToken("user", 10); tokeString == nil {
+	if _, ok := service.CreateToken("user", 10); !ok {
 		test.Errorf("can not create token string")
 	}
 }
 
 func TestValidateToken(test *testing.T) {
 	service := NewJwtAuthenticationService("secret")
-	tokeString := service.CreateToken("user", 1000000)
-	if tokeString == nil {
+	tokeString, ok := service.CreateToken("user", 1000000)
+	if !ok {
 		test.Errorf("can not create token string")
 	}
-	if userId, ex := service.ValidateToken(*tokeString); ex != nil {
+	if userId, ex := service.ValidateToken(tokeString); ex != nil {
 		test.Errorf(ex.GetMessage())
-	} else if *userId != "user" {
-		test.Errorf("expected user id %s but got %s", "1", *userId)
+	} else if userId != "user" {
+		test.Errorf("expected user id %s but got %s", "1", userId)
 	}
 }
 
 func TestTokenExpiredException(test *testing.T) {
 	service := NewJwtAuthenticationService("secret")
-	tokeString := service.CreateToken("user", 1)
+	tokeString, _ := service.CreateToken("user", 1)
 	time.Sleep(time.Millisecond * 2)
-	if _, ex := service.ValidateToken(*tokeString); ex == nil {
+	if _, ex := service.ValidateToken(tokeString); ex == nil {
 		test.Errorf("expect got exception but got nothing")
 	}
 }

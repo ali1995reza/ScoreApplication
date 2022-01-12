@@ -27,7 +27,7 @@ func (server *ScoreApplicationServer) Run() {
 		if error != nil {
 			context.JSON(http.StatusBadRequest, errorResponseFrom(error))
 		} else {
-			context.JSON(http.StatusOK, ClientToken{Token: *token})
+			context.JSON(http.StatusOK, ClientToken{Token: token})
 		}
 	})
 	router.GET(UrlGetTopScoreList, func(context *gin.Context) {

@@ -9,6 +9,8 @@ import (
 	"impl-score-app-server/score-app/abstract/validation"
 )
 
+const ExpirationTokenDuration = int64(10 * 60 * 1000)
+
 type ScoreApplication struct {
 	authenticationService service.AuthenticationService
 	userRepository        repository.UserRepository
@@ -20,13 +22,17 @@ func NewScoreApplication(authenticationService service.AuthenticationService, us
 	return &ScoreApplication{authenticationService: authenticationService, userRepository: userRepository, scoreRepository: scoreRepository, validator: *validation.NewValidator()}
 }
 
-func (app *ScoreApplication) Login(userId string) (*string, exceptions.ScoreApplicationException) {
+func (app *ScoreApplication) Login(userId string) (string, exceptions.ScoreApplicationException) {
 	fmt.Printf("login user with id %s\n", userId)
 	if !app.validator.IsValidUserId(userId) {
-		return nil, exceptions.NewInvalidUserIdFormatException("user id format invalid")
+		return "", exceptions.NewInvalidUserIdFormatException("user id format invalid")
 	}
 	app.userRepository.AddOrGet(userId)
-	return app.authenticationService.CreateToken(userId, 10*60*1000), nil
+	if token, ok := app.authenticationService.CreateToken(userId, 10*60*1000); ok {
+		return token, nil
+	} else {
+		return "", exceptions.NewUnknownException("can not create authentication token")
+	}
 }
 
 func (app *ScoreApplication) SubmitScore(token string, applicationId string, score int64) (*models.RankedScore, exceptions.ScoreApplicationException) {
@@ -34,7 +40,7 @@ func (app *ScoreApplication) SubmitScore(token string, applicationId string, sco
 	if ex != nil {
 		return nil, ex
 	}
-	user := app.userRepository.Get(*userId)
+	user := app.userRepository.Get(userId)
 	if user == nil {
 		return nil, exceptions.NewAuthenticationTokenInvalidException("user not found")
 	}
@@ -44,8 +50,8 @@ func (app *ScoreApplication) SubmitScore(token string, applicationId string, sco
 	if !app.validator.IsValidApplicationId(applicationId) {
 		return nil, exceptions.NewInvalidApplicationIdFormatException("application id format invalid")
 	}
-	fmt.Printf("submit score %d for application %s by user %s\n", score, applicationId, *userId)
-	return app.scoreRepository.Save(*userId, applicationId, score), nil
+	fmt.Printf("submit score %d for application %s by user %s\n", score, applicationId, userId)
+	return app.scoreRepository.Save(userId, applicationId, score), nil
 }
 
 func (app *ScoreApplication) GetTopScoreList(applicationId string, offset int64, size int64) ([]*models.RankedScore, exceptions.ScoreApplicationException) {
