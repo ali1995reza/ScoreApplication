@@ -60,7 +60,16 @@ func (server *ScoreApplicationServer) Run() {
 		}
 		result, err := server.application.SubmitScore(token, applicationId, request.Score)
 		if err != nil {
+			if _, ok := err.(*exceptions.AuthenticationTokenInvalidException); ok {
+				context.JSON(http.StatusUnauthorized, errorResponseFrom(err))
+				return
+			}
+			if _, ok := err.(*exceptions.AuthenticationTokenExpiredException); ok {
+				context.JSON(http.StatusUnauthorized, errorResponseFrom(err))
+				return
+			}
 			context.JSON(http.StatusBadRequest, errorResponseFrom(err))
+			return
 		}
 		context.JSON(http.StatusOK, result)
 	})
@@ -84,6 +93,7 @@ func (server *ScoreApplicationServer) Run() {
 				return
 			}
 			context.JSON(http.StatusBadRequest, errorResponseFrom(err))
+			return
 		}
 		context.JSON(http.StatusOK, result)
 	})
