@@ -1,6 +1,7 @@
 package gram.gs.server.impl.javalin;
 
 import gram.gs.ScoreApplication;
+import gram.gs.exceptions.InvalidParametersException;
 import gram.gs.server.abs.ScoreAppHttpServer;
 import gram.gs.server.impl.dto.SubmitScoreRequest;
 import gram.gs.server.impl.dto.TokenResponse;
@@ -12,6 +13,8 @@ import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+
+import java.util.function.Supplier;
 
 import static gram.gs.server.impl.javalin.statics.ApiStatics.*;
 
@@ -56,8 +59,8 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
     }
 
     private void getTopScoreList(Context ctx) throws Exception {
-        final long offset = Long.parseLong(ctx.queryParam(QueryParams.OFFSET));
-        final long size = Long.parseLong(ctx.queryParam(QueryParams.SIZE));
+        final long offset = parseLongOrElse(ctx.queryParam(QueryParams.OFFSET), () -> new InvalidParametersException("[offset] is not a valid number or not exists"));
+        final long size = parseLongOrElse(ctx.queryParam(QueryParams.SIZE), () -> new InvalidParametersException("[size] is not a valid number or not exists"));
         final String applicationId = ctx.pathParam(PathParams.APPLICATION_ID);
         ctx.result(
                 JsonUtil.toJsonBytes(application.getTopScoreList(applicationId, offset, size))
@@ -65,8 +68,8 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
     }
 
     private void searchScoreList(Context ctx) throws Exception {
-        final int top = Integer.parseInt(ctx.queryParam(QueryParams.TOP));
-        final int bottom = Integer.parseInt(ctx.queryParam(QueryParams.BOTTOM));
+        final int top = parseIntOrElse(ctx.queryParam(QueryParams.TOP), () -> new InvalidParametersException("[top] is not a valid number or not exists"));
+        final int bottom = parseIntOrElse(ctx.queryParam(QueryParams.BOTTOM), () -> new InvalidParametersException("[bottom] is not a valid number or not exists"));
         final String userId = ctx.queryParam(QueryParams.USER_ID);
         final String applicationId = ctx.pathParam(PathParams.APPLICATION_ID);
         ctx.result(
@@ -78,5 +81,21 @@ public class JavalinScoreAppHttpServer extends ScoreAppHttpServer {
         ServerExceptionResponse response = ServerExceptionHandler.handle(e);
         ctx.status(response.getStatus());
         ctx.result(JsonUtil.toJsonBytes(response.getBody()));
+    }
+
+    private static <T extends Throwable> Integer parseIntOrElse(String intStr, Supplier<T> ex) throws T {
+        try {
+            return Integer.parseInt(intStr);
+        } catch (Exception e) {
+            throw ex.get();
+        }
+    }
+
+    private static <T extends Throwable> Long parseLongOrElse(String longStr, Supplier<T> ex) throws T {
+        try {
+            return Long.parseLong(longStr);
+        } catch (Exception e) {
+            throw ex.get();
+        }
     }
 }
