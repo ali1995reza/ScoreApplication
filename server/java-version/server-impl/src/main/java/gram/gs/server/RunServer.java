@@ -26,7 +26,7 @@ public class RunServer {
         String host = InputUtils.getString("Server Host", "please enter a valid host", s -> !s.isBlank(), input);
         int port = InputUtils.getInteger("Server Port", "please enter a valid number int [0, 65535]", i -> i > 0 && i < 65535, input);
         int numberOfThreads = InputUtils.getInteger("Number of IO handler Threads", "please enter a positive number", i -> i > 0, input);
-        String db = InputUtils.getValidString("Enter Database model [MEM,H2DB]", List.of(MEM, H2DB), input);
+        String db = InputUtils.getValidString("Enter Database model [MEM,H2DB(SQL base)]", List.of(MEM, H2DB), input);
 
         UserRepository userRepository = null;
         ScoreRepository scoreRepository = null;
