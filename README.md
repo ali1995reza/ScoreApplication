@@ -162,6 +162,7 @@ directory.<br/>
 - Use `build.[bat|sh]` to build from source
 - Use `run.[bat|sh]` to run the built file
 - Use `build_and_run.[bat|sh]` to build and run server
+- You can even run go-server without any need to build by using `{project-root}/bin/go-server.[bat|sh]`
 
 ##### Requirements
 
@@ -180,6 +181,8 @@ directory.<br/>
 - Use `build.[bat|sh]` to build from source
 - Use `run.[bat|sh]` to run the built file
 - Use `build_and_run.[bat|sh]` to build and run server
+- You can even run java-server without any need to build by using `{project-root}/bin/java-server.[bat|sh]` and having `Java` available
+  in your path
 
 ##### Requirements
 
@@ -203,6 +206,8 @@ This client will provide a command line interface to communicate with server.
 - Use `build.[bat|sh]` to build from source
 - Use `run.[bat|sh]` to run the built file
 - Use `build_and_run.[bat|sh]` to build and run client
+- You can even run client without any need to build by using `{project-root}/bin/client.[bat|sh]` and having `Java` available
+  in your path 
 
 ##### Requirements
 
