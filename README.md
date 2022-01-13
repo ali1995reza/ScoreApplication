@@ -225,7 +225,7 @@ This client will provide a command line interface to communicate with server.
 |`submit`            | submit score for a specific application 
 |`get`               | get top score list for a specific application
 |`search`            | search score of a specific user in a specific application
-|`load`              | to start a new load test on the server and will sends simulated requests to server
+|`load`              | to start a new load test on the server which will sends simulated requests to server frequently
 |`exit`              | exit
 
 
