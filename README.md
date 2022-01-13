@@ -151,7 +151,7 @@ Client can login to application by requesting to this api.
 
 ## Server
 
-There is 2 implements of this server by `Go` and `Java`.
+There are 2 implementations of the server using `Go` and `Java`.
 
 ### Go-Version Server
 
@@ -197,7 +197,7 @@ directory.<br/>
 <br/>
 
 ## Client
-There is just one implement of client in `Java` which can use both server versions.
+There is just one implementation of client in `Java` which can use both server versions.
 You can find source of it under `{project-root}/client/client-app`.
 To build client you can use `batch` or `shell` script provided in `{project-root}/client/`
 directory.<br/>
